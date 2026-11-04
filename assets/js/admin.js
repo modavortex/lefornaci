@@ -128,7 +128,7 @@
   var accessi = [];
   function disegnaAccessi() {
     var q = (root.querySelector('[data-cerca-accessi]').value || '').toLowerCase();
-    root.querySelector('[data-accessi]').innerHTML = accessi.filter(function (a) { return !q || (/^\d+$/.test(q) ? a.utente === q : a.utente.toLowerCase().indexOf(q) >= 0) || String(a.negozio).toLowerCase().indexOf(q) >= 0; }).map(function (a) {
+    root.querySelector('[data-accessi]').innerHTML = accessi.filter(function (a) { return !q || (/^\d+$/.test(q) ? a.utente === q : a.utente.toLowerCase().indexOf(q) >= 0) || !/^\d+$/.test(q) && String(a.negozio).toLowerCase().indexOf(q) >= 0; }).map(function (a) {
       return '<div class="acc"><span class="vnum" style="width:auto;border-radius:8px;padding:0 8px">' + esc(a.utente) + '</span><span><b>' + esc(a.negozio) + '</b><small class="muted">' + (a.email ? esc(a.email) + ' · ' : '') + (a.ultimo ? 'Ultimo accesso ' + esc(a.ultimo) : 'Mai entrato') + (a.cambiare ? ' · codice da cambiare' : '') + '</small>' + (a.demo ? '<small class="demo-code">Codice di prova: <code>' + esc(a.demo) + '</code></small>' : '') + '</span>' +
         '<label class="tick"><input type="checkbox" data-attivo="' + esc(a.utente) + '"' + (a.attivo ? ' checked' : '') + '>Attivo</label><button class="btn" type="button" data-rigenera="' + esc(a.utente) + '">Nuovo codice</button></div>';
     }).join('');
