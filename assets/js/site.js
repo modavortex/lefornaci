@@ -41,10 +41,42 @@
   document.querySelectorAll('[data-aperture]').forEach(function (sec) { sec.hidden = !sec.querySelector('[data-creato]:not([hidden])'); });
   // vetrina: con meno di 4 sponsor, i posti liberi ruotano ogni giorno
   var v = document.querySelector('[data-vetrina]');
+  function vetrina(sponsorSlugs) {
+    var all = [].slice.call(v.querySelectorAll('[data-slug]')), spons = [];
+    all.forEach(function (el) { el.hidden = true; var bd = el.querySelector('.badge'); if (bd) bd.textContent = 'Scelto per te'; });
+    (sponsorSlugs || []).slice(0, 4).forEach(function (slug) {
+      var el = all.filter(function (x) { return x.getAttribute('data-slug') === slug; })[0];
+      if (el) { el.hidden = false; el.querySelector('.badge').textContent = 'In evidenza'; spons.push(el); }
+    });
+    var pool = all.filter(function (x) { return spons.indexOf(x) < 0 && x.getAttribute('data-logo') === '1'; }), seed = Math.floor(today / 86400000), shown = spons.slice();
+    for (var i = 0; shown.length < 4 && pool.length; i++) { var k = (seed * 7 + i * 13) % pool.length; pool[k].hidden = false; shown.push(pool[k]); pool.splice(k, 1); }
+    shown.forEach(function (el) { v.appendChild(el); });
+  }
   if (v) {
-    var spons = [].slice.call(v.querySelectorAll('[data-sponsor]')), pool = [].slice.call(v.querySelectorAll('[data-rotazione]'));
-    var free = Math.max(0, 4 - spons.length), seed = Math.floor(today / 86400000);
-    pool.forEach(function (el) { el.hidden = true; });
-    for (var i = 0; i < free && pool.length; i++) { var k = (seed * 7 + i * 13) % pool.length; pool[k].hidden = false; v.appendChild(pool[k]); pool.splice(k, 1); }
+    var fallback = [].slice.call(v.querySelectorAll('[data-sponsor]')).map(function (x) { return x.getAttribute('data-slug'); });
+    vetrina(fallback);
+    if (window.LF_MOTORE && window.fetch) {
+      var ctl = window.AbortController ? new AbortController() : null; if (ctl) setTimeout(function () { ctl.abort(); }, 4000);
+      fetch(window.LF_MOTORE + '?azione=vetrina', ctl ? { signal: ctl.signal } : {}).then(function (r) { return r.json(); })
+        .then(function (r) { if (r && r.ok && r.vetrina && r.vetrina.length) vetrina(r.vetrina); }).catch(function () {});
+    }
+  }
+  // scheda aggiornata dal negozio (area riservata): sostituisce i dati della pagina
+  var sc = document.querySelector('[data-locale]');
+  if (sc && window.LF_MOTORE && window.fetch) {
+    fetch(window.LF_MOTORE + '?azione=scheda&locale=' + encodeURIComponent(sc.getAttribute('data-locale'))).then(function (r) { return r.json(); }).then(function (r) {
+      var d = r && r.ok && r.scheda; if (!d || d.pausa) return;
+      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+      if (d.descrizione) { var p = sc.querySelector('[data-f="descrizione"]'); if (p) { p.hidden = false; p.innerHTML = d.descrizione.split(/\n+/).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join(''); } }
+      var info = sc.querySelector('[data-info]');
+      function row(k, html) { if (!info) return; var r = info.querySelector('[data-row="' + k + '"]'); if (!r) { r = document.createElement('div'); r.setAttribute('data-row', k); r.innerHTML = '<dt>' + k + '</dt><dd></dd>'; info.appendChild(r); } r.querySelector('dd').innerHTML = html; }
+      function tel(t) { var x = t.replace(/[^\d+]/g, ''); return x.charAt(0) === '+' ? x : '+39' + x; }
+      if (d.orari) row('Orari', esc(d.orari));
+      if (d.telefono) { row('Telefono', '<a href="tel:' + tel(d.telefono) + '">' + esc(d.telefono) + '</a>'); document.querySelectorAll('a[href^="tel:"]').forEach(function (a) { if (!a.closest('.foot')) a.href = 'tel:' + tel(d.telefono); }); }
+      if (d.whatsapp) row('WhatsApp', '<a href="https://wa.me/' + tel(d.whatsapp).replace('+', '') + '">' + esc(d.whatsapp) + '</a>');
+      if (d.email) row('Email', '<a href="mailto:' + esc(d.email) + '">' + esc(d.email) + '</a>');
+      if (d.sito) { var u = /^https?:/.test(d.sito) ? d.sito : 'https://' + d.sito; row('Sito', '<a href="' + esc(u) + '" rel="noopener">' + esc(d.sito.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')) + '</a>'); }
+      if (d.instagram) row('Instagram', '<a href="' + esc(d.instagram) + '" rel="noopener">Instagram</a>');
+    }).catch(function () {});
   }
 })();

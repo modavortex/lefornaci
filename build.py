@@ -75,7 +75,7 @@ def logo_or_mono(s, cls=''):
     return '<span class="monogram %s %s" aria-hidden="true">%s</span>' % (cls, 'dark' if s['locale'] == '40' else '', e(mono))
 
 def page(rel, title, desc, body, current='', extra_head='', scripts='', body_class='has-tabbar', canonical=''):
-    nav = [('', 'Home', 'home'), ('negozi/', 'Negozi e mappa', 'negozi'), ('eventi/', 'Eventi', 'eventi'), ('apri-un-negozio/', 'Apri un negozio', 'apri')]
+    nav = [('', 'Home', 'home'), ('negozi/', 'Negozi e mappa', 'negozi'), ('eventi/', 'Eventi', 'eventi'), ('apri-il-tuo-spazio/', 'Apri il tuo spazio', 'apri')]
     navhtml = ''.join('<a href="%s%s"%s>%s</a>' % (rel, u, ' aria-current="page"' if k == current else '', t) for u, t, k in nav)
     tabs = [('', 'Home', 'home', I['home']), ('negozi/', 'Negozi', 'negozi', I['map']), ('eventi/', 'Eventi', 'eventi', I['cal']), ('#arrivare', 'Arrivare', 'arrivare', I['pin'])]
     tabhtml = ''.join('<a href="%s%s"%s>%s%s</a>' % ('' if u.startswith('#') else rel, u if not u.startswith('#') else (rel + u if current != 'home' else u), ' aria-current="page"' if k == current else '', ic, t) for u, t, k, ic in tabs)
@@ -115,11 +115,12 @@ def page(rel, title, desc, body, current='', extra_head='', scripts='', body_cla
 </main>
 %(foot)s
 <nav class="tabbar" aria-label="Navigazione rapida">%(tabs)s</nav>
+<script>window.LF_MOTORE=%(motore)s;</script>
 <script src="%(rel)sassets/js/site.js" defer></script>
 %(scripts)s
 </body>
 </html>
-''' % dict(title=e(title), desc=e(desc), robots=robots, canon=canon, rel=rel, extra=extra_head, bc=body_class, nav=navhtml, menu=I['menu'], body=body, foot=footer(rel), tabs=tabhtml, scripts=scripts)
+''' % dict(title=e(title), desc=e(desc), robots=robots, canon=canon, rel=rel, extra=extra_head, bc=body_class, nav=navhtml, menu=I['menu'], body=body, foot=footer(rel), tabs=tabhtml, scripts=scripts, motore=json.dumps(C.get('motore', '')))
 
 def footer(rel):
     orari = ''.join('<li>%s: %s</li>' % (e(o['cosa']), e(o['quando'])) for o in C['orari'])
@@ -137,7 +138,7 @@ def footer(rel):
   </div>
   <div><h3>Orari</h3><ul>%(orari)s</ul></div>
   <div><h3>Visita</h3><ul><li><a href="%(rel)snegozi/">Negozi e mappa</a></li><li><a href="%(rel)seventi/">Eventi</a></li><li><a href="%(ig)s">Instagram</a></li><li><a href="%(fb)s">Facebook</a></li></ul></div>
-  <div><h3>Business</h3><ul><li><a href="%(rel)sapri-un-negozio/">Apri un negozio</a></li><li><a href="%(rel)sapri-un-negozio/#temporary">Spazi temporary</a></li><li><a href="%(rel)saccesso-operatori/">Accesso operatori</a></li></ul></div>
+  <div><h3>Business</h3><ul><li><a href="%(rel)sapri-il-tuo-spazio/">Apri il tuo spazio</a></li><li><a href="%(rel)sapri-il-tuo-spazio/?tipo=temporary">Temporary</a></li><li><a href="%(rel)sapri-il-tuo-spazio/?tipo=banchetto">Banchetti in galleria</a></li><li><a href="%(rel)saccesso-operatori/">Accesso operatori</a></li><li><a href="%(rel)sadmin/">Amministrazione</a></li></ul></div>
  </div>
  <div class="bottom"><div class="wrap">
   <span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap">© %(anno)s Le Fornaci Mega Shopping Center · Centro gestito da <span class="chip" style="padding:5px 9px"><img src="%(rel)sassets/img/logo-svicom.png" alt="Svicom Real Estate Managers" width="70" height="22" style="height:22px;width:auto"></span></span>
@@ -168,7 +169,7 @@ def minimap(piano, hl=None, fill='#ECE6DC', hl_fill='#B4472B', bg='#FFFFFF', str
 
 # ---------- dati per la mappa interattiva ----------
 def dati_js():
-    loc = [{k: l.get(k) for k in ('locale', 'piano', 'stato', 'nome', 'slug', 'categoria', 'logo', 'contorni', 'logo_o', 'logo_v')} for l in LOC]
+    loc = [{k: l.get(k) for k in ('locale', 'piano', 'stato', 'nome', 'slug', 'categoria', 'logo', 'contorni', 'logo_o', 'logo_v', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione')} for l in LOC]
     d = {'categorie': CATS, 'piani': M['piani'], 'aree': M.get('aree', {}), 'servizi': M['servizi'], 'ingressi': M['ingressi'], 'locali': loc}
     write('assets/js/dati.js', '/* Generato da build.py: non modificare a mano. */\nwindow.LF=' + json.dumps(d, ensure_ascii=False, separators=(',', ':')) + ';\n')
 
@@ -186,13 +187,14 @@ def home():
     arrivi = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(x['come'].replace('In ', '').capitalize()), e(x['testo'])) for x in C['come_arrivare'])
     orari = '<div><dt>Orari</dt><dd>%s</dd></div>' % ' · '.join('%s %s' % (o['cosa'].replace('Galleria negozi', 'Galleria'), o['quando'].replace('Tutti i giorni ', '')) for o in C['orari'])
     sponsor = [s for s in SHOPS if s.get('in_evidenza')][:4]
-    pool = [s for s in SHOPS if s.get('logo') is not None and not s.get('in_evidenza')]
+    pool = [s for s in SHOPS if not s.get('in_evidenza')]
     tints = ['#E6DED3', '#DDE3E0', '#E5DEE8', '#E8E2D2']
     def card(s, i, attr, badge):
+        attr = 'data-slug="%s" data-logo="%s" %s' % (s['slug'], '1' if s.get('logo') is not None else '', attr)
         return '<a class="shop-card" href="negozi/%s/" %s><div class="cover" style="background:%s"><span class="badge">%s</span>%s</div><div class="body"><small>%s · Locale %s</small><b>%s</b></div></a>' % (
             s['slug'], attr, tints[i % 4], badge, logo_or_mono(s), e(CAT[s['categoria']]['nome']), e(s['locale']), e(s['nome']))
     vetrina = ''.join(card(s, i, 'data-sponsor', 'In evidenza') for i, s in enumerate(sponsor))
-    vetrina += ''.join(card(s, i, 'data-rotazione' + (' hidden' if i >= 4 - len(sponsor) else ''), 'Scelto per te') for i, s in enumerate(pool))
+    vetrina += ''.join(card(s, i, 'data-rotazione' + (' hidden' if i >= 4 - len(sponsor) or s.get('logo') is None else ''), 'Scelto per te') for i, s in enumerate(pool))
     nuovi = [s for s in SHOPS if s['stato'] == 'nuova_apertura' and s.get('creato_il')]
     aperture = ''.join('<a class="card opening" href="negozi/%s/" data-creato="%s"><span class="mark monogram dark" style="font-size:16px">%s</span><span><small class="muted" style="font-weight:700;color:var(--accent)">Apre a %s</small><br><b style="font-family:var(--f-display);font-size:22px">%s</b><br><span class="muted">%s · Locale %s</span></span></a>' % (
         s['slug'], s['creato_il'], 'DAMICO' if s['locale'] == '40' else e(s['nome'][:2].upper()), e(s.get('apertura', '').lower()), e(s['nome']), e(CAT[s['categoria']]['nome']), e(s['locale'])) for s in nuovi)
@@ -251,7 +253,7 @@ def negozi_index():
         rows = ''.join('<a class="shop-row" href="%s/" data-shop="%s" data-c="%s" data-name="%s" data-st="%s">%s<span><b>%s</b><small>Locale %s · %s</small></span></a>' % (
             s['slug'], e(s['locale']), s['categoria'], e(s['nome']), s['stato'], logo_or_mono(s), e(s['nome']), e(s['locale']), e(PIANO[s['piano']])) for s in items)
         groups += '<div class="list-group" data-group><h3><i style="background:%s"></i>%s <em>%d</em></h3><div class="shop-list">%s</div></div>' % (c['colore'], e(c['nome']), len(items), rows)
-    liberi = ''.join('<a class="shop-row" href="../apri-un-negozio/?locale=%s" data-shop="%s" data-c="" data-name="" data-st="libero"><span class="monogram" style="width:64px;height:32px;font-size:12px;background:#fff;border:1.5px dashed #B4472B;border-radius:8px">%s</span><span><b>Prossimamente</b><small>%s</small></span></a>' % (
+    liberi = ''.join('<a class="shop-row" href="../apri-il-tuo-spazio/?locale=%s" data-shop="%s" data-c="" data-name="" data-st="libero"><span class="monogram" style="width:64px;height:32px;font-size:12px;background:#fff;border:1.5px dashed #B4472B;border-radius:8px">%s</span><span><b>Prossimamente</b><small>%s</small></span></a>' % (
         e(l['locale']), e(l['locale']), e(l['locale']), 'Su due piani' if l['locale'] == '7' else 'Locale libero') for l in LIBERI)
     groups += '<div class="list-group" data-group><h3><i style="border:1.5px dashed #B4472B"></i>Locali disponibili <em>%d</em></h3><div class="shop-list">%s</div></div>' % (len(LIBERI), liberi)
     body = '''
@@ -312,7 +314,7 @@ def shop_page(s):
     if s.get('whatsapp'): rows.append(('WhatsApp', e(s['whatsapp'])))
     if s.get('email'): rows.append(('Email', '<a href="mailto:%s">%s</a>' % (e(s['email']), e(s['email']))))
     if s.get('sito'): rows.append(('Sito', '<a href="%s" rel="noopener">%s</a>' % (e(norm_url(s['sito'])), e(re.sub(r'^https?://(www\.)?', '', norm_url(s['sito'])).rstrip('/')))))
-    info = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (k, v if k in ('Telefono', 'Email', 'Sito') else e(v)) for k, v in rows)
+    info = ''.join('<div data-row="%s"><dt>%s</dt><dd>%s</dd></div>' % (k, k, v if k in ('Telefono', 'Email', 'Sito') else e(v)) for k, v in rows)
     paras = ''.join('<p>%s</p>' % e(p) for p in (s.get('descrizione') or '').split('\n') if p.strip())
     photos = ''
     if s.get('foto'):
@@ -323,7 +325,7 @@ def shop_page(s):
     if s.get('logo') is not None: head_logo = '<div class="shop-logo logo-chip">%s</div>' % shop_logo
     else: head_logo = shop_logo.replace('class="monogram ', 'class="shop-logo monogram ')
     body = '''
-<div class="wrap">
+<div class="wrap" data-locale="%(loc)s">
  <nav class="crumbs" aria-label="Percorso"><a href="%(rel)s">Home</a> / <a href="../">Negozi</a> / %(cat)s</nav>
  <div class="shop-head">
   %(logo)s
@@ -336,7 +338,7 @@ def shop_page(s):
    %(photos)s
   </div>
   <div class="grid">
-   <dl class="card info">%(info)s</dl>
+   <dl class="card info" data-info>%(info)s</dl>
    <a class="card where" href="../?locale=%(loc)s">%(mini)s<span><b>Dove si trova:</b> %(piano)s, locale %(loc)s · <b style="color:var(--accent)">Apri la mappa</b></span></a>
   </div>
  </div>
@@ -344,7 +346,7 @@ def shop_page(s):
  <a class="owner-hint" href="%(rel)saccesso-operatori/">Sei il titolare di %(name)s? Aggiorna orari, contatti, foto e promozioni. <b style="color:var(--accent)">Accesso operatori →</b></a>
 </div>
 <div class="sticky-actions">%(sticky)s</div>''' % dict(rel=rel, cat=e(cat['nome']), logo=head_logo, pills=pills, name=e(s['nome']), acts=''.join(acts),
-        prose=('<div class="card prose">%s</div>' % paras) if paras else '', photos=photos, info=info, loc=e(s['locale']), piano=e(PIANO[s['piano']]),
+        prose='<div class="card prose" data-f="descrizione"%s>%s</div>' % ('' if paras else ' hidden', paras), photos=photos, info=info, loc=e(s['locale']), piano=e(PIANO[s['piano']]),
         mini=minimap(s['piano'], s['locale']), related=related, sticky=''.join(sticky[:2]))
     ld = {'@context': 'https://schema.org', '@type': 'Store', 'name': s['nome'], 'url': '%s/negozi/%s/' % (SITO, s['slug']),
           'description': (s.get('descrizione') or '').split('\n')[0][:300],
@@ -371,51 +373,156 @@ def eventi():
 </div>''' % rows
     write('eventi/index.html', page('../', 'Eventi – Le Fornaci Beinasco', 'Eventi, animazione per bambini, corse e iniziative al centro commerciale Le Fornaci di Beinasco.', body, 'eventi', canonical='eventi/'))
 
-# ---------- APRI UN NEGOZIO ----------
+# ---------- APRI IL TUO SPAZIO ----------
 def apri():
-    opts = ''.join('<option value="%s">Locale %s%s</option>' % (e(l['locale']), e(l['locale']), ' · su due piani' if l['locale'] == '7' else '') for l in LIBERI)
-    cards = ''.join('<a class="card" href="../negozi/?locale=%s" style="padding:12px;text-decoration:none;display:grid;gap:10px">%s<b>Locale %s</b><span class="muted" style="font-size:14px">%s · %s</span></a>' % (
+    SP = C['spazi']
+    tipi = ''.join('''<button class="tipo" type="button" data-tipo="%s" aria-pressed="%s"><span class="tipo-n">%d</span><b>%s</b><span>%s</span></button>''' % (k, 'true' if i == 0 else 'false', i + 1, e(v['titolo']), e(v['testo'])) for i, (k, v) in enumerate(SP.items()))
+    opts = ''.join('<option value="Locale %s">Locale %s · %s%s</option>' % (e(l['locale']), e(l['locale']), e(PIANO[l['piano']]), ' · su due piani' if l['locale'] == '7' else '') for l in LIBERI)
+    cards = ''.join('<a class="card libero" href="../negozi/?locale=%s">%s<span><b>Locale %s</b><small>%s · %s</small></span></a>' % (
         e(l['locale']), minimap(l['piano'], l['locale']), e(l['locale']), e(PIANO[l['piano']]), 'Su due piani' if l['locale'] == '7' else 'Disponibile') for l in LIBERI)
-    body = '''<div class="wrap" style="padding-top:24px">
- <h1>Apri il tuo negozio alle Fornaci</h1>
- <p class="muted" style="max-width:640px;font-size:17px;margin:12px 0 0">Oltre 4.000 posti auto, Ipercoop, The Space Cinema e %(n)d negozi già aperti. Scegli un locale libero o uno spazio temporary in galleria: ti ricontattiamo entro un giorno lavorativo.</p>
- <section class="section"><div class="section-head"><h2>Locali disponibili</h2><span class="muted">%(nl)d spazi</span></div><div class="grid grid-4">%(cards)s</div></section>
- <section class="section" id="temporary"><h2>Spazi temporary</h2><p class="muted" style="max-width:640px">Postazioni in galleria per periodi brevi: lanci di prodotto, stagionalità, eventi. Indica il periodo che ti interessa.</p></section>
- <section class="section"><h2 style="margin-bottom:14px">Richiedi informazioni</h2>
-  <form class="card form" action="mailto:%(mail)s?subject=Richiesta%%20locale%%20Le%%20Fornaci" method="post" enctype="text/plain" style="max-width:640px">
-   <label>Nome e cognome<input name="nome" required autocomplete="name"></label>
-   <label>Azienda / insegna<input name="insegna"></label>
-   <label>Telefono<input name="telefono" type="tel" required autocomplete="tel"></label>
-   <label>Email<input name="email" type="email" required autocomplete="email"></label>
-   <label>Cosa ti interessa<select name="spazio" data-locale-select><option value="">Scegli…</option>%(opts)s<option value="temporary">Spazio temporary</option></select></label>
-   <label>Messaggio<textarea name="messaggio" rows="4" placeholder="Settore, metri quadri desiderati, periodo…"></textarea></label>
-   <button class="btn btn-primary" type="submit">Invia la richiesta</button>
-   <p class="muted" style="font-size:13px;margin:0">Nell’anteprima il modulo apre la tua app di posta. Sul sito ufficiale invierà direttamente alla direzione.</p>
-  </form>
+    body = '''<section class="spazio-hero"><div class="wrap">
+ <p class="eyebrow">Per aziende, brand e artigiani</p>
+ <h1>Apri il tuo spazio alle Fornaci</h1>
+ <p class="lead">Un negozio, un temporary o un banchetto in galleria: dicci cosa ti serve e ricevi subito via email gli spazi disponibili.</p>
+ <div class="numeri"><div><b>%(n)d</b><span>negozi aperti</span></div><div><b>4.000</b><span>posti auto</span></div><div><b>9</b><span>sale cinema</span></div><div><b>7/7</b><span>aperti tutti i giorni</span></div></div>
+</div></section>
+<div class="wrap">
+ <section class="section" aria-labelledby="t-tipo"><h2 id="t-tipo">Cosa cerchi?</h2><div class="tipi" role="group" aria-label="Tipo di spazio">%(tipi)s</div></section>
+ <section class="section" id="disponibili" data-solo="negozio"><div class="section-head"><h2>Locali disponibili ora</h2><span class="muted">%(nl)d spazi</span></div><div class="liberi">%(cards)s</div></section>
+ <section class="section" id="modulo">
+  <div class="form-wrap">
+   <div class="form-side"><h2>Richiedi informazioni</h2><p class="muted">Compili in un minuto. Ricevi subito una email con gli spazi disponibili e la conferma che la richiesta è stata presa in carico; la direzione ti ricontatta entro un giorno lavorativo.</p>
+    <ul class="checks"><li>Risposta automatica immediata</li><li>Nessun impegno</li><li>Ti ricontatta una persona, non un risponditore</li></ul></div>
+   <form class="card form" data-spazio-form novalidate>
+    <input type="hidden" name="tipo" value="negozio">
+    <div class="sr"><label>Lascia vuoto<input name="sito_web" tabindex="-1" autocomplete="off"></label></div>
+    <div class="two"><label>Nome e cognome<input name="nome" required autocomplete="name"></label><label>Azienda o insegna<input name="azienda" autocomplete="organization"></label></div>
+    <div class="two"><label>Telefono<input name="telefono" type="tel" required autocomplete="tel" inputmode="tel"></label><label>Email<input name="email" type="email" required autocomplete="email"></label></div>
+    <label data-dettaglio-label><span data-dettaglio-testo>Locale che ti interessa</span>
+     <select name="dettaglio_locale" data-solo="negozio"><option value="">Qualsiasi locale libero</option>%(opts)s</select>
+     <input name="dettaglio_testo" data-solo="temporary banchetto" placeholder="Es. dal 1 al 24 dicembre" hidden>
+    </label>
+    <label>Raccontaci la tua attività<textarea name="messaggio" rows="3" placeholder="Settore, metri quadri, cosa vorresti esporre…"></textarea></label>
+    <label class="consenso"><input type="checkbox" name="privacy" required> <span>Acconsento al trattamento dei dati per essere ricontattato su questa richiesta.</span></label>
+    <button class="btn btn-primary" type="submit" data-invia>Invia la richiesta</button>
+    <p class="form-msg" data-msg role="status" hidden></p>
+   </form>
+  </div>
  </section>
 </div>
-<script>(function(){var l=new URLSearchParams(location.search).get('locale'),s=document.querySelector('[data-locale-select]');if(l&&s)s.value=l;})();</script>''' % dict(n=len(SHOPS), nl=len(LIBERI), cards=cards, mail=e(C['email']), opts=opts)
-    write('apri-un-negozio/index.html', page('../', 'Apri un negozio – Le Fornaci Beinasco', 'Locali liberi e spazi temporary al centro commerciale Le Fornaci di Beinasco: richiedi informazioni.', body, 'apri', canonical='apri-un-negozio/'))
+<script>window.LF_EMAIL=%(mail)s;</script>''' % dict(n=len(SHOPS), nl=len(LIBERI), cards=cards, tipi=tipi, opts=opts, mail=json.dumps(C['email']))
+    scripts = '<script src="../assets/js/spazio.js" defer></script>'
+    write('apri-il-tuo-spazio/index.html', page('../', 'Apri il tuo spazio – Le Fornaci Beinasco', 'Negozi, temporary e banchetti in galleria al centro commerciale Le Fornaci di Beinasco: ricevi subito gli spazi disponibili.', body, 'apri', '', scripts, canonical='apri-il-tuo-spazio/'))
+    write('apri-un-negozio/index.html', '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Apri il tuo spazio</title><meta http-equiv="refresh" content="0; url=../apri-il-tuo-spazio/"><link rel="canonical" href="../apri-il-tuo-spazio/"><a href="../apri-il-tuo-spazio/">Apri il tuo spazio</a>')
+
+# ---------- AMMINISTRAZIONE ----------
+def admin():
+    body = '''<div class="wrap admin" data-admin>
+ <section data-vista="login" class="admin-login">
+  <h1>Area riservata</h1>
+  <p class="muted">Direzione: utente <b>admin</b>. Negozi: il numero del vostro locale e il codice ricevuto dalla direzione.</p>
+  <form class="card form" data-form="login">
+   <label>Utente<input name="utente" autocomplete="username" autocapitalize="none" placeholder="admin oppure numero del locale" required></label>
+   <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+   <button class="btn btn-dark" type="submit">Entra</button>
+   <p class="form-msg" role="status" hidden></p>
+   <button class="linklike" type="button" data-vai="reset">Password dimenticata?</button>
+  </form>
+ </section>
+ <section data-vista="reset" class="admin-login" hidden>
+  <h1>Reimposta la password</h1>
+  <p class="muted">Solo per l’utente admin: ti mandiamo un codice di 6 cifre all’email di recupero. I negozi che hanno perso il codice lo chiedono alla direzione, che lo rigenera.</p>
+  <div class="card form">
+   <button class="btn" type="button" data-azione="reset_chiedi">Invia il codice</button>
+   <label>Codice ricevuto<input name="codice" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></label>
+   <label>Nuova password<input name="nuova" type="password" autocomplete="new-password" minlength="8"></label>
+   <button class="btn btn-dark" type="button" data-azione="reset_conferma">Salva la nuova password</button>
+   <p class="form-msg" role="status" hidden></p>
+   <button class="linklike" type="button" data-vai="login">Torna all’accesso</button>
+  </div>
+ </section>
+ <section data-vista="pannello" hidden>
+  <div class="admin-top"><h1>Amministrazione</h1><button class="btn" type="button" data-esci>Esci</button></div>
+  <div class="note" data-cambiare hidden>Stai usando la password iniziale: cambiala ora dalla scheda <b>Sicurezza</b>.</div>
+  <div class="tabs" role="tablist">
+   <button role="tab" data-tab="vetrina" aria-selected="true">Vetrina</button>
+   <button role="tab" data-tab="richieste" aria-selected="false">Richieste</button>
+   <button role="tab" data-tab="negozi" aria-selected="false">Accessi negozi</button>
+   <button role="tab" data-tab="destinatari" aria-selected="false">Destinatari</button>
+   <button role="tab" data-tab="sicurezza" aria-selected="false">Sicurezza</button>
+  </div>
+  <div data-pane="vetrina" class="card pane">
+   <h2>Negozi in evidenza in home</h2>
+   <p class="muted">Fino a 4 negozi, con date di inizio e fine. Se un posto è vuoto, la home lo riempie a rotazione.</p>
+   <div data-vetrina-righe></div>
+   <button class="btn btn-dark" type="button" data-salva="vetrina">Salva la vetrina</button>
+   <p class="form-msg" role="status" hidden></p>
+  </div>
+  <div data-pane="richieste" class="card pane" hidden>
+   <h2>Richieste ricevute</h2>
+   <p class="muted">Le ultime 30. Tutte le richieste sono anche nel Foglio Google del sito.</p>
+   <div data-richieste></div>
+  </div>
+  <div data-pane="negozi" class="card pane" hidden>
+   <h2>Accessi dei negozi</h2>
+   <p class="muted">Ogni negozio entra con il numero del suo locale e un codice. Il codice si vede una sola volta, quando lo generi: consegnalo al negozio alla firma del contratto.</p>
+   <div class="nuovo-codice" data-nuovo-codice hidden></div>
+   <input class="search" type="search" placeholder="Cerca negozio o locale…" data-cerca-accessi>
+   <div data-accessi></div>
+  </div>
+  <div data-pane="destinatari" class="card pane" hidden>
+   <h2>Chi riceve le richieste</h2>
+   <p class="muted">Una o più persone o agenzie. Per ognuna scegli quali richieste riceve in automatico.</p>
+   <div data-destinatari></div>
+   <div class="row-actions"><button class="btn" type="button" data-aggiungi>+ Aggiungi destinatario</button><button class="btn btn-dark" type="button" data-salva="destinatari">Salva</button></div>
+   <p class="form-msg" role="status" hidden></p>
+  </div>
+  <div data-pane="sicurezza" class="card pane" hidden>
+   <h2>Cambia password</h2>
+   <form class="form" data-form="password" style="padding:0">
+    <label>Password attuale<input name="attuale" type="password" autocomplete="current-password" required></label>
+    <label>Nuova password<input name="nuova" type="password" autocomplete="new-password" minlength="8" required></label>
+    <p class="muted" style="margin:0;font-size:14px">Almeno 8 caratteri, con lettere e numeri.</p>
+    <button class="btn btn-dark" type="submit">Cambia password</button>
+    <p class="form-msg" role="status" hidden></p>
+   </form>
+  </div>
+ </section>
+ <section data-vista="negozio" hidden>
+  <div class="admin-top"><div><p class="eyebrow" style="color:var(--accent)" data-mio-locale></p><h1 data-mio-nome>La tua scheda</h1></div><button class="btn" type="button" data-esci>Esci</button></div>
+  <div class="note" data-cambiare-n hidden>Stai usando il codice ricevuto dalla direzione: scegli una password tua qui sotto, in “Sicurezza”.</div>
+  <form class="card form" data-form="scheda">
+   <label class="consenso" style="font-size:15px!important;color:var(--ink)"><input type="checkbox" name="pausa"> <span><b>Metti in pausa le modifiche</b>: finché è attivo, sul sito resta la versione precedente. Toglilo quando hai finito.</span></label>
+   <div class="two"><label>Telefono<input name="telefono" type="tel"></label><label>WhatsApp<input name="whatsapp" type="tel"></label></div>
+   <div class="two"><label>Email<input name="email" type="email"></label><label>Sito web<input name="sito" type="url" placeholder="https://"></label></div>
+   <div class="two"><label>Instagram<input name="instagram" placeholder="https://www.instagram.com/…"></label><label>Orari<input name="orari" placeholder="Tutti i giorni 9:00–20:30"></label></div>
+   <label>Descrizione<textarea name="descrizione" rows="6" maxlength="1500"></textarea></label>
+   <p class="muted" style="margin:0;font-size:14px">Copertina e 3 foto del negozio le carica la direzione, per avere tutte le pagine uniformi. <span data-aggiornato></span></p>
+   <div class="row-actions"><button class="btn btn-dark" type="submit">Salva la scheda</button><a class="btn" data-vedi-scheda href="#">Vedi la tua pagina</a></div>
+   <p class="form-msg" role="status" hidden></p>
+  </form>
+  <details class="card pane" style="margin-top:14px"><summary style="font-weight:700;cursor:pointer">Sicurezza: cambia password</summary>
+   <form class="form" data-form="password-n" style="padding:12px 0 0">
+    <label>Password attuale<input name="attuale" type="password" autocomplete="current-password" required></label>
+    <label>Nuova password<input name="nuova" type="password" autocomplete="new-password" minlength="8" required></label>
+    <button class="btn btn-dark" type="submit">Cambia password</button>
+    <p class="form-msg" role="status" hidden></p>
+   </form>
+  </details>
+ </section>
+ <div class="note" data-no-motore hidden>Il motore del sito non è ancora collegato: l’area admin si attiva quando è installato lo script Google (vedi backend/LEGGIMI.md).</div>
+</div>'''
+    scripts = '<script src="../assets/js/dati.js" defer></script><script src="../assets/js/admin.js" defer></script>'
+    html_ = page('../', 'Area riservata – Le Fornaci', 'Area riservata alla direzione e ai negozi del centro.', body, '', '', scripts, canonical=None).replace('<meta name="robots" content="index,follow">', '<meta name="robots" content="noindex">')
+    write('admin/index.html', html_)
 
 # ---------- ACCESSO OPERATORI (anteprima) ----------
 def operatori():
-    body = '''<div class="wrap" style="padding-top:24px;max-width:640px">
- <h1>Accesso operatori</h1>
- <p class="muted" style="font-size:17px">Ogni negozio riceve un codice alla firma del contratto. Con il codice aggiorni da solo orari, contatti, descrizione e fino a 10 contenuti (promo, novità, eventi).</p>
- <div class="note" style="margin:18px 0">Anteprima: l’area operatori si attiva con la versione sul sito ufficiale del centro. Qui il modulo non salva nulla.</div>
- <form class="card form" onsubmit="event.preventDefault();this.querySelector('[data-msg]').hidden=false">
-  <label>Codice negozio<input name="codice" inputmode="numeric" autocomplete="one-time-code" placeholder="Es. 40-XXXX" required></label>
-  <button class="btn btn-dark" type="submit">Entra</button>
-  <p data-msg hidden class="muted" style="margin:0">Nell’anteprima l’accesso non è attivo.</p>
- </form>
- <h2 style="font-size:22px;margin-top:32px">Cosa può fare ogni negozio</h2>
- <ul style="line-height:1.8;color:var(--ink-2)"><li>Mettere la scheda in pausa mentre aggiorna i dati, e riattivarla con un tocco</li><li>Aggiornare telefono, WhatsApp, email, sito, social e orari</li><li>Pubblicare fino a 10 contenuti con data di scadenza</li><li>Le 3 foto del negozio e la copertina le carica il centro, per avere tutte le pagine uniformi</li></ul>
-</div>'''
-    write('accesso-operatori/index.html', page('../', 'Accesso operatori – Le Fornaci', 'Area riservata ai negozi del centro commerciale Le Fornaci.', body, '', canonical='accesso-operatori/'))
+    write('accesso-operatori/index.html', '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Area riservata</title><meta http-equiv="refresh" content="0; url=../admin/"><a href="../admin/">Area riservata</a>')
 
 def extra():
     write('404.html', page('/lefornaci/' if ANTEPRIMA else '/', 'Pagina non trovata – Le Fornaci', 'Pagina non trovata.', '<div class="wrap" style="padding:48px 16px"><h1>Pagina non trovata</h1><p class="muted">Forse il negozio ha cambiato indirizzo.</p><a class="btn btn-primary" href="negozi/">Vai a negozi e mappa</a></div>', canonical=None))
-    urls = [''] + ['negozi/', 'eventi/', 'apri-un-negozio/'] + ['negozi/%s/' % s['slug'] for s in SHOPS]
+    urls = [''] + ['negozi/', 'eventi/', 'apri-il-tuo-spazio/'] + ['negozi/%s/' % s['slug'] for s in SHOPS]
     write('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join('<url><loc>%s/%s</loc></url>\n' % (SITO, u) for u in urls))
     write('robots.txt', ('User-agent: *\nDisallow: /\n' if ANTEPRIMA else 'User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n' % SITO))
     write('.nojekyll', '')
@@ -425,5 +532,5 @@ def extra():
 if __name__ == '__main__':
     dati_js(); home(); negozi_index()
     for s in SHOPS: shop_page(s)
-    eventi(); apri(); operatori(); extra()
+    eventi(); apri(); admin(); operatori(); extra()
     print('Fatto: %d negozi, %d locali liberi.' % (len(SHOPS), len(LIBERI)))

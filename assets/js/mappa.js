@@ -130,7 +130,7 @@
         g += '<path d="M' + p.map(function (q) { return q[0] + ' ' + q[1]; }).join('L') + 'Z" fill="' + o.top + '"' + (u.stato === 'libero' && !o.picked ? ' stroke="#D9A08E" stroke-width="1.2" stroke-dasharray="3 2"' : ' stroke="rgba(255,255,255,.7)" stroke-width=".8"') + '/>';
       });
       // logo stampato sul locale, sempre girato verso chi guarda (a passi di 90°)
-      var showLogo = u.logo !== null && u.logo !== undefined && !o.dim && !o.picked && !(S.cat !== 'tutti' && S.cat !== 'liberi');
+      var showLogo = u.logo !== null && u.logo !== undefined && !o.dim;
       if (showLogo) {
         var k = ((Math.round(-S.rot / 90) % 4) + 4) % 4, odd = k % 2 === 1;
         var bx = odd ? u.logo_v : u.logo_o;
