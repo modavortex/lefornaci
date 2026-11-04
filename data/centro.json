@@ -1,0 +1,32 @@
+{
+ "nome": "Le Fornaci Mega Shopping",
+ "indirizzo": "Strada Torino 34/36, 10092 Beinasco (TO)",
+ "telefono": "011 397 1809",
+ "email": "info@centrolefornaci.com",
+ "whatsapp": "393427813192",
+ "instagram": "https://www.instagram.com/centrolefornaci/",
+ "facebook": "https://www.facebook.com/CentroCommercialeLeFornaci/",
+ "sito": "https://centrolefornaci.com",
+ "orari": [
+  {"cosa": "Galleria negozi", "quando": "Tutti i giorni 9:00–20:30"},
+  {"cosa": "Ipercoop", "quando": "Tutti i giorni 9:00–21:00"}
+ ],
+ "come_arrivare": [
+  {"come": "In auto", "testo": "Tangenziale, uscita Corso Orbassano. 4.000 posti auto gratuiti."},
+  {"come": "In bus", "testo": "Linea GTT 5 da Torino e Orbassano."}
+ ],
+ "mappe": {
+  "google": "https://www.google.com/maps/search/?api=1&query=Le+Fornaci+Strada+Torino+34+Beinasco",
+  "waze": "https://waze.com/ul?q=Le%20Fornaci%20Beinasco&navigate=yes"
+ },
+ "eventi": [
+  {"titolo": "Halloween da brividi", "dal": "2026-10-30", "al": "2026-10-31", "quando": "30–31 ottobre · 15:30–19:30", "tipo": "Famiglie", "testo": "Truccabimbi e photo booth a tema, spettacoli di magia e illusionismo, musica e racconti per i più piccoli."},
+  {"titolo": "Incentive Gift Card", "dal": "2026-10-19", "al": "2026-10-26", "quando": "19–26 ottobre", "tipo": "Promo", "testo": "Acquistando una Gift Card da 30 € si riceveva un extra in regalo."},
+  {"titolo": "Maglioni Run", "dal": "2026-09-27", "al": "2026-09-27", "quando": "Domenica 27 settembre", "tipo": "Sport", "testo": "7° Gran Premio Memorial Maurizio Maglioni: sport e passione al Parco Commerciale."},
+  {"titolo": "Holy Splash – La corsa colorata", "dal": "2026-09-19", "al": "2026-09-19", "quando": "Sabato 19 settembre", "tipo": "Sport", "testo": "Una corsa tra nuvole di colore per tutta la famiglia."},
+  {"titolo": "Compleanno Le Fornaci – 38 anni", "dal": "2026-06-20", "al": "2026-06-21", "quando": "20–21 giugno", "tipo": "Feste", "testo": "Spettacolo con Nida Onlus, taglio della torta e DJ set di Pippo Palmieri di Lo Zoo di 105."},
+  {"titolo": "Foodland – Fondazione Veronesi", "dal": "2026-05-04", "al": "2026-05-10", "quando": "4–10 maggio", "tipo": "Famiglie", "testo": "Percorso educativo su alimentazione, movimento e sostenibilità, aperto al pubblico il 9 e 10 maggio."},
+  {"titolo": "Pasqua a colori", "dal": "2026-04-03", "al": "2026-04-04", "quando": "3–4 aprile · 15:30–19:30", "tipo": "Famiglie", "testo": "Due pomeriggi di animazione pasquale per bambini."},
+  {"titolo": "Winter Sport Village", "dal": "2026-02-13", "al": "2026-02-15", "quando": "13–15 febbraio", "tipo": "Sport", "testo": "Il villaggio degli sport invernali dentro il centro."}
+ ]
+}
