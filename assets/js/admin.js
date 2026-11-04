@@ -95,6 +95,7 @@
     var o = datiForm();
     return call({ azione: 'salva_locale', locale: aperto, dati: o }).then(function (r) {
       if (r.ok && window.LF) { var u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; window.LF = window.LF; u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; if (u) { if (o.stato === 'libero') { u.stato = 'libero'; u.nome = ''; } else { Object.keys(o).forEach(function (k) { u[k] = o[k]; }); } } }
+      if (r.ok) call({ azione: 'stato' }).then(function (x) { if (x.ok) { accessi = x.accessi || []; disegnaAccessi(); } });
       return r;
     });
   }
@@ -114,6 +115,7 @@
       return call({ azione: 'bozza_accesso', locale: aperto }).then(function (b) {
         if (!b.ok) { msg(fl, b.errore); return; }
         bz.querySelector('[data-b="a"]').textContent = b.a; bz.querySelector('[data-b="oggetto"]').textContent = b.oggetto; bz.querySelector('[data-b="testo"]').textContent = b.testo;
+        call({ azione: 'stato' }).then(function (x) { if (x.ok) { accessi = x.accessi || []; disegnaAccessi(); } });
         bz.hidden = false; msg(fl, 'Bozza pronta. Il codice precedente di questo locale non vale più.', true);
       });
     });
