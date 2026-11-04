@@ -68,6 +68,7 @@
     (window.LF_MOTORE ? fetch(window.LF_MOTORE + '?azione=scheda&locale=' + encodeURIComponent(sc.getAttribute('data-locale'))).then(function (r) { return r.json(); }) : window.LF_DEMO({ azione: 'scheda', locale: sc.getAttribute('data-locale') })).then(function (r) {
       var d = r && r.ok && r.scheda; if (!d || d.pausa) return;
       function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+      if (d.nome) { var h = sc.querySelector('.shop-head h1'); if (h) h.textContent = d.nome; }
       if (d.descrizione) { var p = sc.querySelector('[data-f="descrizione"]'); if (p) { p.hidden = false; p.innerHTML = d.descrizione.split(/\n+/).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join(''); } }
       var info = sc.querySelector('[data-info]');
       function row(k, html) { if (!info) return; var r = info.querySelector('[data-row="' + k + '"]'); if (!r) { r = document.createElement('div'); r.setAttribute('data-row', k); r.innerHTML = '<dt>' + k + '</dt><dd></dd>'; info.appendChild(r); } r.querySelector('dd').innerHTML = html; }
@@ -80,4 +81,34 @@
       if (d.instagram) row('Instagram', '<a href="' + esc(d.instagram) + '" rel="noopener">Instagram</a>');
     }).catch(function () {});
   }
+  // scheda generica (/negozi/scheda/?locale=N): nuovi ingressi senza pagina dedicata
+  var dyn = document.querySelector('[data-scheda-dinamica]');
+  if (dyn) document.addEventListener('DOMContentLoaded', function () {
+    var loc = (location.search.match(/locale=([^&]+)/) || [])[1], LF = window.LF || { locali: [], categorie: [] };
+    var u = LF.locali.filter(function (x) { return x.locale === decodeURIComponent(loc || ''); })[0];
+    function q(k) { return dyn.querySelector('[data-d="' + k + '"]'); }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    if (!u || u.stato === 'libero' || !u.nome) { q('nome').textContent = u ? 'Locale ' + u.locale + ' · prossimamente' : 'Negozio non trovato'; q('dove').href = '../' + (u ? '?locale=' + u.locale : ''); q('pos').textContent = u ? 'locale ' + u.locale : ''; return; }
+    if (u.slug) { location.replace('../' + u.slug + '/'); return; }
+    var cat = LF.categorie.filter(function (c) { return c.id === u.categoria; })[0] || { nome: 'Negozio', colore: '#17140F', testo: '#fff' };
+    document.title = u.nome + ' – Le Fornaci Beinasco';
+    q('nome').textContent = u.nome; q('cat').textContent = cat.nome;
+    q('mono').textContent = u.nome.replace(/[^A-Za-zÀ-ú0-9 ]/g, '').split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+    var nuovo = u.stato === 'nuova_apertura', piano = u.piano === 'P' ? 'Primo piano' : 'Piano terra';
+    q('pills').innerHTML = '<span class="pill ' + (nuovo ? 'pill-new">Apre ' + (u.apertura ? 'a ' + esc(u.apertura.toLowerCase()) : 'a breve') : 'pill-ok">Aperto') + '</span><span class="pill">Locale ' + esc(u.locale) + ' · ' + piano + '</span><span class="pill" style="background:' + cat.colore + ';color:' + cat.testo + ';border:0">' + esc(cat.nome) + '</span>';
+    function tel(t) { var x = String(t).replace(/[^\d+]/g, ''); return x.charAt(0) === '+' ? x : '+39' + x; }
+    var a = [];
+    if (u.telefono) a.push('<a class="btn btn-primary" href="tel:' + tel(u.telefono) + '">Chiama</a>');
+    if (u.whatsapp) a.push('<a class="btn' + (a.length ? '' : ' btn-primary') + '" href="https://wa.me/' + tel(u.whatsapp).replace('+', '') + '">WhatsApp</a>');
+    a.push('<a class="btn' + (a.length ? '' : ' btn-primary') + '" href="../?locale=' + esc(u.locale) + '">Trovalo sulla mappa</a>');
+    if (u.sito) a.push('<a class="btn" href="' + esc(/^https?:/.test(u.sito) ? u.sito : 'https://' + u.sito) + '" rel="noopener">Sito web</a>');
+    if (u.instagram) a.push('<a class="btn" href="' + esc(u.instagram) + '" rel="noopener">Instagram</a>');
+    q('azioni').innerHTML = a.join('');
+    if (u.descrizione) { q('descrizione').hidden = false; q('descrizione').innerHTML = u.descrizione.split(/\n+/).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join(''); }
+    var rows = [['Orari', esc(u.orari || 'Tutti i giorni 9:00–20:30')], ['Posizione', piano + ' · locale ' + esc(u.locale)]];
+    if (u.telefono) rows.push(['Telefono', '<a href="tel:' + tel(u.telefono) + '">' + esc(u.telefono) + '</a>']);
+    if (u.email) rows.push(['Email', '<a href="mailto:' + esc(u.email) + '">' + esc(u.email) + '</a>']);
+    q('info').innerHTML = rows.map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>'; }).join('');
+    q('dove').href = '../?locale=' + encodeURIComponent(u.locale); q('pos').textContent = piano + ', locale ' + u.locale;
+  });
 })();

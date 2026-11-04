@@ -56,13 +56,60 @@
   <div class="admin-top"><h1>Amministrazione</h1><button class="btn" type="button" data-esci>Esci</button></div>
   <div class="note" data-cambiare hidden>Stai usando la password iniziale: cambiala ora dalla scheda <b>Sicurezza</b>.</div>
   <div class="tabs" role="tablist">
-   <button role="tab" data-tab="vetrina" aria-selected="true">Vetrina</button>
+   <button role="tab" data-tab="schede" aria-selected="true">Schede locali</button>
+   <button role="tab" data-tab="vetrina" aria-selected="false">Vetrina</button>
    <button role="tab" data-tab="richieste" aria-selected="false">Richieste</button>
    <button role="tab" data-tab="negozi" aria-selected="false">Accessi negozi</button>
    <button role="tab" data-tab="destinatari" aria-selected="false">Destinatari</button>
    <button role="tab" data-tab="sicurezza" aria-selected="false">Sicurezza</button>
   </div>
-  <div data-pane="vetrina" class="card pane">
+  <div data-pane="schede" class="card pane">
+   <div data-schede-elenco>
+    <h2>Schede dei locali</h2>
+    <p class="muted">Tutti gli 81 locali del centro. Apri una scheda per correggerla, inserire un nuovo ingresso in un locale libero o liberare un locale.</p>
+    <div class="filtri-schede"><input class="search" type="search" placeholder="Cerca nome o numero…" data-cerca-schede>
+     <select data-filtro-schede><option value="">Tutti</option><option value="aperto">Aperti</option><option value="nuova_apertura">Nuove aperture</option><option value="libero">Liberi</option></select></div>
+    <div data-schede></div>
+   </div>
+   <form class="form" data-form="locale" hidden>
+    <button class="linklike" type="button" data-torna>← Tutti i locali</button>
+    <h2 data-ed-titolo>Locale</h2>
+    <p class="muted" data-ed-sotto></p>
+    <label>Stato<select name="stato"><option value="aperto">Aperto</option><option value="nuova_apertura">Nuova apertura (in arrivo)</option><option value="libero">Libero – prossimamente</option></select></label>
+    <div data-se-occupato>
+     <label>Nome dell’insegna<input name="nome" required></label>
+     <label>Settore<select name="categoria" data-categorie></select></label>
+     <label data-se-nuovo>Quando apre<input name="apertura" placeholder="Es. Dicembre 2026"></label>
+     <fieldset class="op"><legend>Operatore</legend>
+      <label>Email dell’operatore<input name="email_operatore" type="email" placeholder="titolare@negozio.it"></label>
+      <p class="muted small">Riceve via email l’utente (numero del locale) e la password per aggiornare da solo la sua scheda.</p>
+     </fieldset>
+     <label>Telefono<input name="telefono" inputmode="tel"></label>
+     <label>WhatsApp<input name="whatsapp" inputmode="tel"></label>
+     <label>Email pubblica<input name="email" type="email"></label>
+     <label>Sito web<input name="sito" placeholder="https://"></label>
+     <label>Instagram<input name="instagram" placeholder="https://www.instagram.com/…"></label>
+     <label>Orari<input name="orari" placeholder="Tutti i giorni 9:00–20:30"></label>
+     <label>Descrizione<textarea name="descrizione" rows="5"></textarea></label>
+    </div>
+    <div class="row-btn">
+     <button class="btn btn-dark" type="submit">Salva la scheda</button>
+     <button class="btn" type="button" data-invia-accesso>Invia accesso all’operatore</button>
+     <a class="btn" data-ed-vedi target="_blank" rel="noopener">Vedi la pagina</a>
+    </div>
+    <p class="form-msg" role="status" hidden></p>
+   </form>
+  </div>
+  <div class="bozza-bg" data-bozza hidden>
+   <div class="bozza card" role="dialog" aria-modal="true" aria-labelledby="bozza-t">
+    <div class="bozza-tag">Bozza · in questa versione nessuna email viene inviata</div>
+    <h2 id="bozza-t">Email di accesso</h2>
+    <dl class="bozza-head"><dt>A</dt><dd data-b="a"></dd><dt>Oggetto</dt><dd data-b="oggetto"></dd></dl>
+    <pre class="bozza-testo" data-b="testo"></pre>
+    <div class="row-btn"><button class="btn btn-dark" type="button" data-b-copia>Copia il testo</button><button class="btn" type="button" data-b-chiudi>Chiudi</button></div>
+   </div>
+  </div>
+  <div data-pane="vetrina" class="card pane" hidden>
    <h2>Negozi in evidenza in home</h2>
    <p class="muted">Fino a 4 negozi, con date di inizio e fine. Se un posto è vuoto, la home lo riempie a rotazione.</p>
    <div data-vetrina-righe></div>

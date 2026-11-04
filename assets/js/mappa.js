@@ -197,7 +197,7 @@
     } else if (u.stato === 'da_verificare') {
       html += '<b>Locale ' + esc(u.locale) + '</b><p>Informazioni in aggiornamento.</p>';
     } else {
-      html += '<b>' + esc(u.nome) + '</b><div class="row" style="justify-content:flex-start;gap:6px;flex-wrap:wrap"><span class="pill" style="background:' + cat.colore + ';color:' + cat.testo + ';border:0">' + esc(cat.nome) + '</span><span class="pill ' + (u.stato === 'nuova_apertura' ? 'pill-new">Nuova apertura' : 'pill-ok">Aperto oggi') + '</span></div><a class="btn btn-dark" href="' + ROOT + 'negozi/' + u.slug + '/">Vai alla vetrina</a>';
+      html += '<b>' + esc(u.nome) + '</b><div class="row" style="justify-content:flex-start;gap:6px;flex-wrap:wrap"><span class="pill" style="background:' + cat.colore + ';color:' + cat.testo + ';border:0">' + esc(cat.nome) + '</span><span class="pill ' + (u.stato === 'nuova_apertura' ? 'pill-new">Nuova apertura' : 'pill-ok">Aperto oggi') + '</span></div><a class="btn btn-dark" href="' + ROOT + 'negozi/' + (u.slug ? u.slug + '/' : 'scheda/?locale=' + encodeURIComponent(u.locale)) + '">Vai alla vetrina</a>';
     }
     pop.innerHTML = html;
     pop.querySelector('.x').addEventListener('click', function () { select(null); });

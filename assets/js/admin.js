@@ -55,15 +55,81 @@
       if (!r.ok) { vista('login'); return; }
       vista('pannello');
       root.querySelector('[data-cambiare]').hidden = !r.cambiare;
-      disegnaVetrina(r.vetrina); disegnaDest(r.destinatari); disegnaRichieste(r.richieste); accessi = r.accessi || []; disegnaAccessi();
+      disegnaVetrina(r.vetrina); disegnaDest(r.destinatari); disegnaRichieste(r.richieste); disegnaSchede(); accessi = r.accessi || []; disegnaAccessi();
     }).catch(function () { vista('login'); });
   }
+  // Schede locali (solo admin)
+  var CATS = window.LF ? window.LF.categorie : [], STATI = { aperto: 'Aperto', nuova_apertura: 'Nuova apertura', libero: 'Libero' }, aperto = null;
+  root.querySelector('[data-categorie]').innerHTML = CATS.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nome) + '</option>'; }).join('');
+  function tutti() { return (window.LF ? window.LF.locali : []).slice().sort(function (a, b) { return a.locale - b.locale; }); }
+  function disegnaSchede() {
+    var q = (root.querySelector('[data-cerca-schede]').value || '').toLowerCase(), st = root.querySelector('[data-filtro-schede]').value;
+    root.querySelector('[data-schede]').innerHTML = tutti().filter(function (u) {
+      return (!st || u.stato === st || (st === 'aperto' && u.stato === 'da_verificare')) && (!q || u.locale === q || (u.nome || '').toLowerCase().indexOf(q) >= 0);
+    }).map(function (u) {
+      var lib = u.stato === 'libero';
+      return '<button type="button" class="srow" data-apri="' + u.locale + '"><span class="vnum">' + u.locale + '</span><span><b>' + (lib ? 'Libero' : esc(u.nome)) + '</b><small class="muted">' + (lib ? 'Inserisci un nuovo ingresso' : (STATI[u.stato] || 'Aperto') + (u.categoria ? ' · ' + esc((CATS.filter(function (c) { return c.id === u.categoria; })[0] || {}).nome || '') : '')) + '</small></span><span class="pill' + (lib ? ' pill-new' : '') + '">' + (lib ? 'Prossimamente' : 'Apri') + '</span></button>';
+    }).join('');
+  }
+  root.querySelector('[data-cerca-schede]').addEventListener('input', disegnaSchede);
+  root.querySelector('[data-filtro-schede]').addEventListener('change', disegnaSchede);
+  var fl = root.querySelector('[data-form="locale"]'), elenco = root.querySelector('[data-schede-elenco]');
+  function mostraCampi() { var st = fl.stato.value; fl.querySelector('[data-se-occupato]').hidden = st === 'libero'; fl.querySelector('[data-se-nuovo]').hidden = st !== 'nuova_apertura'; fl.nome.required = st !== 'libero'; fl.querySelector('[data-invia-accesso]').hidden = st === 'libero'; }
+  fl.stato.addEventListener('change', mostraCampi);
+  root.querySelector('[data-schede]').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-apri]'); if (!b) return;
+    var u = tutti().filter(function (x) { return x.locale === b.getAttribute('data-apri'); })[0]; aperto = u.locale;
+    fl.reset(); fl.querySelector('.form-msg').hidden = true;
+    fl.stato.value = u.stato === 'da_verificare' ? 'aperto' : u.stato;
+    ['nome', 'categoria', 'apertura', 'email_operatore', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'].forEach(function (k) { if (u[k] !== undefined && u[k] !== null) fl[k].value = u[k]; });
+    if (!u.categoria) fl.categoria.value = CATS[0] ? CATS[0].id : '';
+    if (u.stato === 'libero') fl.stato.value = 'nuova_apertura';
+    root.querySelector('[data-ed-titolo]').textContent = u.stato === 'libero' ? 'Nuovo ingresso · locale ' + u.locale : (u.nome + ' · locale ' + u.locale);
+    root.querySelector('[data-ed-sotto]').textContent = (u.piano === 'P' ? 'Primo piano' : 'Piano terra') + (u.stato === 'libero' ? ' · oggi il locale è libero: compila i dati del nuovo negozio.' : '');
+    var v = root.querySelector('[data-ed-vedi]'); v.hidden = u.stato === 'libero'; v.href = '../negozi/' + (u.slug ? u.slug + '/' : 'scheda/?locale=' + u.locale);
+    mostraCampi(); elenco.hidden = true; fl.hidden = false; fl.scrollIntoView({ block: 'start' });
+  });
+  root.querySelector('[data-torna]').addEventListener('click', function () { fl.hidden = true; elenco.hidden = false; disegnaSchede(); });
+  function datiForm() { var o = {}; ['stato', 'nome', 'categoria', 'apertura', 'email_operatore', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'].forEach(function (k) { o[k] = fl[k].value.trim(); }); return o; }
+  function salvaLocale() {
+    var o = datiForm();
+    return call({ azione: 'salva_locale', locale: aperto, dati: o }).then(function (r) {
+      if (r.ok && window.LF) { var u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; window.LF = window.LF; u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; if (u) { if (o.stato === 'libero') { u.stato = 'libero'; u.nome = ''; } else { Object.keys(o).forEach(function (k) { u[k] = o[k]; }); } } }
+      return r;
+    });
+  }
+  fl.addEventListener('submit', function (e) {
+    e.preventDefault();
+    salvaLocale().then(function (r) {
+      msg(fl, r.ok ? (fl.stato.value === 'libero' ? 'Locale liberato: sul sito ora risulta “Prossimamente”.' : 'Scheda salvata: mappa, elenco e pagina del negozio sono aggiornati.') : r.errore, r.ok);
+      if (r.ok) { root.querySelector('[data-ed-vedi]').hidden = fl.stato.value === 'libero'; root.querySelector('[data-ed-titolo]').textContent = (fl.stato.value === 'libero' ? 'Locale ' : fl.nome.value + ' · locale ') + aperto; }
+    });
+  });
+  var bz = root.querySelector('[data-bozza]');
+  fl.querySelector('[data-invia-accesso]').addEventListener('click', function () {
+    if (!fl.email_operatore.value.trim()) { msg(fl, 'Inserisci l’email dell’operatore.'); fl.email_operatore.focus(); return; }
+    if (!fl.reportValidity()) return;
+    salvaLocale().then(function (r) {
+      if (!r.ok) { msg(fl, r.errore); return; }
+      return call({ azione: 'bozza_accesso', locale: aperto }).then(function (b) {
+        if (!b.ok) { msg(fl, b.errore); return; }
+        bz.querySelector('[data-b="a"]').textContent = b.a; bz.querySelector('[data-b="oggetto"]').textContent = b.oggetto; bz.querySelector('[data-b="testo"]').textContent = b.testo;
+        bz.hidden = false; msg(fl, 'Bozza pronta. Il codice precedente di questo locale non vale più.', true);
+      });
+    });
+  });
+  bz.querySelector('[data-b-chiudi]').addEventListener('click', function () { bz.hidden = true; });
+  bz.addEventListener('click', function (e) { if (e.target === bz) bz.hidden = true; });
+  bz.querySelector('[data-b-copia]').addEventListener('click', function (e) {
+    var t = 'A: ' + bz.querySelector('[data-b="a"]').textContent + '\nOggetto: ' + bz.querySelector('[data-b="oggetto"]').textContent + '\n\n' + bz.querySelector('[data-b="testo"]').textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { e.target.textContent = 'Copiato ✓'; setTimeout(function () { e.target.textContent = 'Copia il testo'; }, 1800); }).catch(function () {});
+  });
   // Accessi negozi (solo admin)
   var accessi = [];
   function disegnaAccessi() {
     var q = (root.querySelector('[data-cerca-accessi]').value || '').toLowerCase();
-    root.querySelector('[data-accessi]').innerHTML = accessi.filter(function (a) { return !q || a.utente.toLowerCase().indexOf(q) >= 0 || String(a.negozio).toLowerCase().indexOf(q) >= 0; }).map(function (a) {
-      return '<div class="acc"><span class="vnum" style="width:auto;border-radius:8px;padding:0 8px">' + esc(a.utente) + '</span><span><b>' + esc(a.negozio) + '</b><small class="muted">' + (a.ultimo ? 'Ultimo accesso ' + esc(a.ultimo) : 'Mai entrato') + (a.cambiare ? ' · codice da cambiare' : '') + '</small>' + (a.demo ? '<small class="demo-code">Codice di prova: <code>' + esc(a.demo) + '</code></small>' : '') + '</span>' +
+    root.querySelector('[data-accessi]').innerHTML = accessi.filter(function (a) { return !q || (/^\d+$/.test(q) ? a.utente === q : a.utente.toLowerCase().indexOf(q) >= 0) || String(a.negozio).toLowerCase().indexOf(q) >= 0; }).map(function (a) {
+      return '<div class="acc"><span class="vnum" style="width:auto;border-radius:8px;padding:0 8px">' + esc(a.utente) + '</span><span><b>' + esc(a.negozio) + '</b><small class="muted">' + (a.email ? esc(a.email) + ' · ' : '') + (a.ultimo ? 'Ultimo accesso ' + esc(a.ultimo) : 'Mai entrato') + (a.cambiare ? ' · codice da cambiare' : '') + '</small>' + (a.demo ? '<small class="demo-code">Codice di prova: <code>' + esc(a.demo) + '</code></small>' : '') + '</span>' +
         '<label class="tick"><input type="checkbox" data-attivo="' + esc(a.utente) + '"' + (a.attivo ? ' checked' : '') + '>Attivo</label><button class="btn" type="button" data-rigenera="' + esc(a.utente) + '">Nuovo codice</button></div>';
     }).join('');
   }

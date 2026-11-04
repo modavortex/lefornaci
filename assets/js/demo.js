@@ -14,6 +14,39 @@
     for (var i = 0; i < 4; i++) { s = (s * 1103515245 + 12345) % 2147483648; out += L[s % L.length]; }
     s = (s * 1103515245 + 12345) % 2147483648; return out + '-' + (1000 + s % 9000);
   }
+  var CAMPI = ['telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'];
+  function unisci(LF) {
+    var d = load(), L = d.locali || {}, S = d.schede || {};
+    (LF.locali || []).forEach(function (u) {
+      var o = L[u.locale], sc = S[u.locale];
+      if (o) {
+        if (o.stato === 'libero') { u.stato = 'libero'; u.nome = ''; u.slug = ''; u.logo = null; u.categoria = ''; }
+        else {
+          if (u.stato === 'libero' || (o.nome && o.nome !== u.nome && !u.slug_fisso)) { if (o.nome !== u.nome) { u.slug = ''; u.logo = null; } }
+          u.stato = o.stato || u.stato; u.nome = o.nome || u.nome; u.categoria = o.categoria || u.categoria; u.apertura = o.apertura || u.apertura;
+        }
+      }
+      if (sc && !sc.pausa && u.stato !== 'libero') CAMPI.forEach(function (k) { if (sc[k] !== undefined) u[k] = sc[k]; });
+    });
+    return LF;
+  }
+  var _lf;
+  try { Object.defineProperty(window, 'LF', { configurable: true, get: function () { return _lf; }, set: function (v) { _lf = unisci(v); } }); } catch (e) {}
+  // elenco negozi (pagina /negozi/): allinea le righe ai locali modificati dall'admin
+  document.addEventListener('DOMContentLoaded', function () {
+    var d = load(); if (!d.locali || !window.LF) return;
+    Object.keys(d.locali).forEach(function (loc) {
+      var u = window.LF.locali.filter(function (x) { return x.locale === loc; })[0], row = document.querySelector('.shop-row[data-shop="' + loc + '"]'); if (!u || !row) return;
+      var b = row.querySelector('b'), sm = row.querySelector('small');
+      row.setAttribute('data-st', u.stato); row.setAttribute('data-name', u.nome || ''); row.setAttribute('data-c', u.categoria || '');
+      if (u.stato === 'libero') { b.textContent = 'Prossimamente'; row.href = (row.getAttribute('href').indexOf('../') === 0 ? '' : '../') + 'apri-il-tuo-spazio/?locale=' + loc; return; }
+      b.textContent = u.nome; if (sm) sm.textContent = 'Locale ' + loc + (u.stato === 'nuova_apertura' ? ' · Nuova apertura' : '');
+      if (!u.slug) {
+        row.href = 'scheda/?locale=' + loc;
+        var ic = row.querySelector('.logo,.monogram'); if (ic) { var m = document.createElement('span'); m.className = 'monogram'; m.setAttribute('aria-hidden', 'true'); m.textContent = u.nome.replace(/[^A-Za-zÀ-ú0-9 ]/g, '').split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase(); ic.replaceWith(m); }
+      }
+    });
+  });
   function oggi() { var d = new Date(); return d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); }
   function negozi() { return (window.LF ? window.LF.locali : []).filter(function (u) { return u.nome && u.stato !== 'libero'; }); }
   function acc(d, u) { d.acc = d.acc || {}; return d.acc[u] = d.acc[u] || { giro: 0, attivo: true }; }
@@ -48,7 +81,7 @@
       if (d.sess !== 'admin') return { ok: false, scaduta: true };
       return { ok: true, cambiare: !d.adminPass, vetrina: d.vetrina || [], richieste: (d.richieste || []).slice().reverse(),
         destinatari: d.destinatari || [{ email: 'direzione@centrolefornaci.com', nome: 'Direzione Le Fornaci', negozio: true, temporary: true, banchetto: true }],
-        accessi: negozi().sort(function (a, b) { return a.locale - b.locale; }).map(function (s) { var a = acc(d, s.locale); return { utente: s.locale, negozio: s.nome, ultimo: a.ultimo || '', cambiare: !a.password, attivo: a.attivo, demo: a.password ? '' : codice(s.locale, a.giro) }; }) };
+        accessi: negozi().sort(function (a, b) { return a.locale - b.locale; }).map(function (s) { var a = acc(d, s.locale); return { utente: s.locale, negozio: s.nome, email: ((d.locali || {})[s.locale] || {}).email_operatore || '', ultimo: a.ultimo || '', cambiare: !a.password, attivo: a.attivo, demo: a.password ? '' : codice(s.locale, a.giro) }; }) };
     },
     rigenera: function (x, d) { var a = acc(d, x.utente); a.giro++; delete a.password; var n = negozi().filter(function (s) { return s.locale === x.utente; })[0] || {}; return { ok: true, utente: x.utente, negozio: n.nome, password: codice(x.utente, a.giro) }; },
     attiva: function (x, d) { acc(d, x.utente).attivo = !!x.attivo; return { ok: true }; },
@@ -65,7 +98,28 @@
       var t = new Date().toISOString().slice(0, 10);
       return { ok: true, vetrina: (d.vetrina || []).filter(function (v) { return (!v.dal || v.dal <= t) && (!v.al || v.al >= t); }).map(function (v) { return v.slug; }) };
     },
-    scheda: function (x, d) { return { ok: true, scheda: (d.schede || {})[x.locale] || null }; }
+    scheda: function (x, d) {
+      var sc = (d.schede || {})[x.locale] || null, o = (d.locali || {})[x.locale];
+      if (o && o.nome && o.stato !== 'libero') { sc = sc ? JSON.parse(JSON.stringify(sc)) : {}; sc.nome = o.nome; }
+      return { ok: true, scheda: sc };
+    },
+    salva_locale: function (x, d) {
+      if (d.sess !== 'admin') return { ok: false, scaduta: true };
+      var v = x.dati; d.locali = d.locali || {}; d.schede = d.schede || {};
+      d.locali[x.locale] = { stato: v.stato, nome: v.nome, categoria: v.categoria, apertura: v.apertura, email_operatore: v.email_operatore };
+      if (v.stato === 'libero') { delete d.schede[x.locale]; if (d.acc) delete d.acc[x.locale]; }
+      else { var sc = d.schede[x.locale] || {}; CAMPI.forEach(function (k) { sc[k] = v[k] || ''; }); sc.aggiornato = oggi() + ' (direzione)'; d.schede[x.locale] = sc; }
+      return { ok: true };
+    },
+    bozza_accesso: function (x, d) {
+      if (d.sess !== 'admin') return { ok: false, scaduta: true };
+      var o = (d.locali || {})[x.locale] || {}; if (!o.email_operatore) return { ok: false, errore: 'Inserisci e salva prima l’email dell’operatore.' };
+      var a = acc(d, x.locale); a.giro++; delete a.password; a.attivo = true;
+      var pw = codice(x.locale, a.giro), base = location.href.split('/admin')[0] + '/';
+      return { ok: true, a: o.email_operatore, oggetto: 'Le Fornaci – il tuo accesso per la scheda di ' + o.nome, testo:
+        'Buongiorno,\n\nbenvenuti alle Fornaci! Da oggi potete aggiornare da soli la scheda di ' + o.nome + ' sul sito del centro: telefono, WhatsApp, orari, sito, Instagram e descrizione.\n\n' +
+        'Indirizzo: ' + base + 'admin/\nUtente: ' + x.locale + '\nPassword: ' + pw + '\n\nAl primo accesso vi chiederemo di scegliere una password vostra.\nCopertina e foto del negozio le carica la direzione, così tutte le pagine restano uniformi.\n\nPer qualsiasi dubbio rispondete a questa email.\n\nLa direzione\nLe Fornaci Mega Shopping – Beinasco' };
+    }
   };
   window.LF_DEMO = function (x) {
     var d = load(), f = R[x.azione], r = f ? f(x, d) : { ok: false, errore: 'Azione sconosciuta' };
