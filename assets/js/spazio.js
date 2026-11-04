@@ -26,6 +26,13 @@
     if (!form.privacy.checked) { say('Serve il consenso per poterti ricontattare.'); return; }
     var dati = { azione: 'richiesta', tipo: tipo, nome: form.nome.value, azienda: form.azienda.value, telefono: form.telefono.value, email: form.email.value,
                  dettaglio: tipo === 'negozio' ? form.dettaglio_locale.value : form.dettaglio_testo.value, messaggio: form.messaggio.value, sito_web: form.sito_web.value };
+    if (!window.LF_MOTORE && window.LF_DEMO) {
+      btn.disabled = true; btn.textContent = 'Invio in corso…';
+      window.LF_DEMO(dati).then(function () {
+        form.innerHTML = '<div class="grazie"><b>Richiesta ricevuta!</b><p>Ti abbiamo appena mandato una email con gli spazi disponibili e la conferma che la richiesta è stata presa in carico. Controlla anche la cartella spam.</p><p>La direzione ti ricontatta entro un giorno lavorativo.</p><p class="muted" style="font-size:13px">Versione dimostrativa: nessuna email è partita davvero. La richiesta compare nell’Area riservata → Richieste.</p></div>';
+      });
+      return;
+    }
     if (!window.LF_MOTORE) {
       var body = Object.keys(dati).filter(function (k) { return k !== 'azione' && k !== 'sito_web' && dati[k]; }).map(function (k) { return k + ': ' + dati[k]; }).join('\n');
       location.href = 'mailto:' + (window.LF_EMAIL || '') + '?subject=' + encodeURIComponent('Richiesta spazio Le Fornaci') + '&body=' + encodeURIComponent(body);

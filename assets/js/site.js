@@ -55,7 +55,8 @@
   if (v) {
     var fallback = [].slice.call(v.querySelectorAll('[data-sponsor]')).map(function (x) { return x.getAttribute('data-slug'); });
     vetrina(fallback);
-    if (window.LF_MOTORE && window.fetch) {
+    if (!window.LF_MOTORE && window.LF_DEMO) window.LF_DEMO({ azione: 'vetrina' }).then(function (r) { if (r.vetrina.length) vetrina(r.vetrina); });
+    else if (window.LF_MOTORE && window.fetch) {
       var ctl = window.AbortController ? new AbortController() : null; if (ctl) setTimeout(function () { ctl.abort(); }, 4000);
       fetch(window.LF_MOTORE + '?azione=vetrina', ctl ? { signal: ctl.signal } : {}).then(function (r) { return r.json(); })
         .then(function (r) { if (r && r.ok && r.vetrina && r.vetrina.length) vetrina(r.vetrina); }).catch(function () {});
@@ -63,8 +64,8 @@
   }
   // scheda aggiornata dal negozio (area riservata): sostituisce i dati della pagina
   var sc = document.querySelector('[data-locale]');
-  if (sc && window.LF_MOTORE && window.fetch) {
-    fetch(window.LF_MOTORE + '?azione=scheda&locale=' + encodeURIComponent(sc.getAttribute('data-locale'))).then(function (r) { return r.json(); }).then(function (r) {
+  if (sc && (window.LF_MOTORE ? window.fetch : window.LF_DEMO)) {
+    (window.LF_MOTORE ? fetch(window.LF_MOTORE + '?azione=scheda&locale=' + encodeURIComponent(sc.getAttribute('data-locale'))).then(function (r) { return r.json(); }) : window.LF_DEMO({ azione: 'scheda', locale: sc.getAttribute('data-locale') })).then(function (r) {
       var d = r && r.ok && r.scheda; if (!d || d.pausa) return;
       function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
       if (d.descrizione) { var p = sc.querySelector('[data-f="descrizione"]'); if (p) { p.hidden = false; p.innerHTML = d.descrizione.split(/\n+/).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join(''); } }

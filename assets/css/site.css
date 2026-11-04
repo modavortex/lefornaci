@@ -309,3 +309,11 @@ body.has-sticky{padding-bottom:84px}
 @media (min-width:760px){.acc{grid-template-columns:auto 1fr auto auto}.acc .tick,.acc .btn{grid-column:auto}}
 .nuovo-codice{padding:14px 16px;border-radius:12px;background:var(--ok-bg);color:var(--ok);line-height:1.6}
 .nuovo-codice code{font-size:20px;font-weight:800;letter-spacing:.08em;background:#fff;padding:2px 8px;border-radius:6px}
+
+.demo-note{margin-top:16px;padding:14px 16px;border-radius:12px;background:#FFF6E5;color:#6B4A12;line-height:1.55;font-size:14px}
+.demo-code{display:block;margin-top:2px}.demo-code code{font-weight:700;letter-spacing:.05em}
+
+[hidden]{display:none!important}
+.tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tabs button{flex:0 0 auto;white-space:nowrap}
+.acc>.vnum{justify-self:start;align-self:start;min-width:44px}
+.acc .demo-code{grid-column:2}

@@ -2,12 +2,14 @@
 (function () {
   'use strict';
   var root = document.querySelector('[data-admin]'); if (!root) return;
-  var URL_ = window.LF_MOTORE;
-  if (!URL_) { root.querySelector('[data-no-motore]').hidden = false; root.querySelectorAll('form button, [data-azione]').forEach(function (b) { b.disabled = true; }); return; }
+  var URL_ = window.LF_MOTORE, DEMO = !URL_ && window.LF_DEMO;
+  if (!URL_ && !DEMO) return;
+  if (DEMO) { var nota = root.querySelector('[data-no-motore]'); nota.hidden = false; root.querySelector('[data-vista="login"]').appendChild(nota); }
   var token = null; try { token = sessionStorage.getItem('lf_admin'); } catch (e) {}
   var shops = (window.LF ? window.LF.locali : []).filter(function (u) { return u.nome; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
   function call(dati) {
     if (token) dati.token = token;
+    if (DEMO) return DEMO(dati).then(function (r) { if (r.scaduta) { esci(); } return r; });
     return fetch(URL_, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dati) }).then(function (r) { return r.json(); })
       .then(function (r) { if (r.scaduta) { esci(); } return r; });
   }
@@ -28,7 +30,7 @@
   });
   var rs = root.querySelector('[data-vista="reset"]');
   rs.querySelector('[data-azione="reset_chiedi"]').addEventListener('click', function () {
-    call({ azione: 'reset_chiedi' }).then(function (r) { msg(rs, r.ok ? 'Codice inviato all’email di recupero: vale 15 minuti.' : r.errore, r.ok); });
+    call({ azione: 'reset_chiedi' }).then(function (r) { msg(rs, r.ok ? (DEMO ? 'In prova il codice è 123456.' : 'Codice inviato all’email di recupero: vale 15 minuti.') : r.errore, r.ok); });
   });
   rs.querySelector('[data-azione="reset_conferma"]').addEventListener('click', function () {
     call({ azione: 'reset_conferma', codice: rs.querySelector('[name=codice]').value, nuova: rs.querySelector('[name=nuova]').value })
@@ -61,7 +63,7 @@
   function disegnaAccessi() {
     var q = (root.querySelector('[data-cerca-accessi]').value || '').toLowerCase();
     root.querySelector('[data-accessi]').innerHTML = accessi.filter(function (a) { return !q || a.utente.toLowerCase().indexOf(q) >= 0 || String(a.negozio).toLowerCase().indexOf(q) >= 0; }).map(function (a) {
-      return '<div class="acc"><span class="vnum" style="width:auto;border-radius:8px;padding:0 8px">' + esc(a.utente) + '</span><span><b>' + esc(a.negozio) + '</b><small class="muted">' + (a.ultimo ? 'Ultimo accesso ' + esc(a.ultimo) : 'Mai entrato') + (a.cambiare ? ' · codice da cambiare' : '') + '</small></span>' +
+      return '<div class="acc"><span class="vnum" style="width:auto;border-radius:8px;padding:0 8px">' + esc(a.utente) + '</span><span><b>' + esc(a.negozio) + '</b><small class="muted">' + (a.ultimo ? 'Ultimo accesso ' + esc(a.ultimo) : 'Mai entrato') + (a.cambiare ? ' · codice da cambiare' : '') + '</small>' + (a.demo ? '<small class="demo-code">Codice di prova: <code>' + esc(a.demo) + '</code></small>' : '') + '</span>' +
         '<label class="tick"><input type="checkbox" data-attivo="' + esc(a.utente) + '"' + (a.attivo ? ' checked' : '') + '>Attivo</label><button class="btn" type="button" data-rigenera="' + esc(a.utente) + '">Nuovo codice</button></div>';
     }).join('');
   }

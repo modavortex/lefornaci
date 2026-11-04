@@ -1,6 +1,6 @@
 # Motore del sito (Google Apps Script + Foglio Google)
 
-Il sito resta statico (GitHub Pages). Le parti "vive" passano da un piccolo motore gratuito su Google:
+Il sito resta statico (GitHub Pages). **Finché `motore` in data/centro.json è vuoto, il sito gira in versione dimostrativa** (`assets/js/demo.js`): admin `admin` / `LeFornaci2026`, negozi con il numero del locale e il codice di prova mostrato in "Accessi negozi", reset con codice 123456, dati salvati solo nel browser. Le parti "vive" passano da un piccolo motore gratuito su Google:
 - moduli **Apri il tuo spazio** (negozio fisico, temporary, banchetto) → risposta automatica al richiedente + email ai destinatari scelti
 - **Vetrina** della home (4 negozi in evidenza) scelta dall'amministrazione
 - **Area riservata**: utente `admin` + un accesso per ogni locale (codici generati e rigenerabili)

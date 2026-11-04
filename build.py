@@ -116,6 +116,7 @@ def page(rel, title, desc, body, current='', extra_head='', scripts='', body_cla
 %(foot)s
 <nav class="tabbar" aria-label="Navigazione rapida">%(tabs)s</nav>
 <script>window.LF_MOTORE=%(motore)s;</script>
+<script src="%(rel)sassets/js/demo.js" defer></script>
 <script src="%(rel)sassets/js/site.js" defer></script>
 %(scripts)s
 </body>
@@ -510,7 +511,7 @@ def admin():
    </form>
   </details>
  </section>
- <div class="note" data-no-motore hidden>Il motore del sito non è ancora collegato: l’area admin si attiva quando è installato lo script Google (vedi backend/LEGGIMI.md).</div>
+ <div class="note demo-note" data-no-motore hidden><b>Versione dimostrativa.</b> Prova con utente <b>admin</b> e password <b>LeFornaci2026</b>. Per entrare come negozio usa il numero del locale e il codice che trovi in <i>Accessi negozi</i> (es. utente <b>40</b>). Le modifiche restano solo su questo browser.</div>
 </div>'''
     scripts = '<script src="../assets/js/dati.js" defer></script><script src="../assets/js/admin.js" defer></script>'
     html_ = page('../', 'Area riservata – Le Fornaci', 'Area riservata alla direzione e ai negozi del centro.', body, '', '', scripts, canonical=None).replace('<meta name="robots" content="index,follow">', '<meta name="robots" content="noindex">')
