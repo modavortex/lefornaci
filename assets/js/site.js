@@ -66,6 +66,7 @@
   var sc = document.querySelector('[data-locale]');
   if (sc && (window.LF_MOTORE ? window.fetch : window.LF_DEMO)) {
     (window.LF_MOTORE ? fetch(window.LF_MOTORE + '?azione=scheda&locale=' + encodeURIComponent(sc.getAttribute('data-locale'))).then(function (r) { return r.json(); }) : window.LF_DEMO({ azione: 'scheda', locale: sc.getAttribute('data-locale') })).then(function (r) {
+      if (r && r.spostato) { location.replace('../scheda/?locale=' + encodeURIComponent(sc.getAttribute('data-locale'))); return; }
       var d = r && r.ok && r.scheda; if (!d || d.pausa) return;
       function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
       if (d.nome) { var h = sc.querySelector('.shop-head h1'); if (h) h.textContent = d.nome; }

@@ -22,7 +22,7 @@
       if (o) {
         if (o.stato === 'libero') { u.stato = 'libero'; u.nome = ''; u.slug = ''; u.logo = null; u.categoria = ''; }
         else {
-          if (u.stato === 'libero' || (o.nome && o.nome !== u.nome && !u.slug_fisso)) { if (o.nome !== u.nome) { u.slug = ''; u.logo = null; } }
+          if (o.nuova || u.stato === 'libero') { u.slug = ''; u.logo = null; u.foto = []; CAMPI.forEach(function (k) { u[k] = ''; }); }
           u.stato = o.stato || u.stato; u.nome = o.nome || u.nome; u.categoria = o.categoria || u.categoria; u.apertura = o.apertura || u.apertura;
         }
       }
@@ -100,13 +100,16 @@
     },
     scheda: function (x, d) {
       var sc = (d.schede || {})[x.locale] || null, o = (d.locali || {})[x.locale];
+      if (o && (o.nuova || o.stato === 'libero')) return { ok: true, spostato: true };
       if (o && o.nome && o.stato !== 'libero') { sc = sc ? JSON.parse(JSON.stringify(sc)) : {}; sc.nome = o.nome; }
       return { ok: true, scheda: sc };
     },
     salva_locale: function (x, d) {
       if (d.sess !== 'admin') return { ok: false, scaduta: true };
       var v = x.dati; d.locali = d.locali || {}; d.schede = d.schede || {};
-      d.locali[x.locale] = { stato: v.stato, nome: v.nome, categoria: v.categoria, apertura: v.apertura, email_operatore: v.email_operatore };
+      var prima = d.locali[x.locale] || {};
+      if (v.azzera) { delete d.schede[x.locale]; if (d.acc) delete d.acc[x.locale]; }
+      d.locali[x.locale] = { stato: v.stato, nome: v.nome, categoria: v.categoria, apertura: v.apertura, email_operatore: v.stato === 'libero' ? '' : v.email_operatore, nuova: v.stato !== 'libero' && (v.azzera || prima.nuova || (prima.stato === 'libero') || !!v.da_libero) };
       if (v.stato === 'libero') { delete d.schede[x.locale]; if (d.acc) delete d.acc[x.locale]; }
       else { var sc = d.schede[x.locale] || {}; CAMPI.forEach(function (k) { sc[k] = v[k] || ''; }); sc.aggiornato = oggi() + ' (direzione)'; d.schede[x.locale] = sc; }
       return { ok: true };

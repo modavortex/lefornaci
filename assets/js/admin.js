@@ -74,7 +74,34 @@
   root.querySelector('[data-cerca-schede]').addEventListener('input', disegnaSchede);
   root.querySelector('[data-filtro-schede]').addEventListener('change', disegnaSchede);
   var fl = root.querySelector('[data-form="locale"]'), elenco = root.querySelector('[data-schede-elenco]');
-  function mostraCampi() { var st = fl.stato.value; fl.querySelector('[data-se-occupato]').hidden = st === 'libero'; fl.querySelector('[data-se-nuovo]').hidden = st !== 'nuova_apertura'; fl.nome.required = st !== 'libero'; fl.querySelector('[data-invia-accesso]').hidden = st === 'libero'; }
+  var daLibero = false, azzera = false, chiesto = '';
+  function mostraCampi() { fl.querySelector('[data-se-nuovo]').hidden = fl.stato.value !== 'nuova_apertura'; }
+  fl.querySelectorAll('[data-chiedi]').forEach(function (b) { b.addEventListener('click', function () {
+    chiesto = b.getAttribute('data-chiedi'); var c = fl.querySelector('[data-conferma]'); c.hidden = false;
+    fl.querySelector('[data-conferma-testo]').textContent = chiesto === 'nuova'
+      ? 'Il locale torna a zero: nome, logo, foto, contatti, descrizione e accesso dell’operatore attuale vengono cancellati. Poi compili i dati della nuova insegna.'
+      : 'Il locale torna libero: sul sito comparirà “Prossimamente” e l’accesso dell’operatore attuale viene disattivato.';
+  }); });
+  fl.querySelector('[data-conferma-no]').addEventListener('click', function () { fl.querySelector('[data-conferma]').hidden = true; });
+  fl.querySelector('[data-conferma-si]').addEventListener('click', function () {
+    fl.querySelector('[data-conferma]').hidden = true;
+    if (chiesto === 'libera') {
+      call({ azione: 'salva_locale', locale: aperto, dati: { stato: 'libero', azzera: true } }).then(function (r) {
+        if (!r.ok) { msg(fl, r.errore); return; }
+        window.LF = window.LF; var u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; if (u) { u.stato = 'libero'; u.nome = ''; u.slug = ''; u.logo = null; }
+        call({ azione: 'stato' }).then(function (x) { if (x.ok) { accessi = x.accessi || []; disegnaAccessi(); } });
+        fl.hidden = true; elenco.hidden = false; disegnaSchede();
+        var m = elenco.querySelector('.form-msg') || elenco.insertAdjacentElement('afterbegin', Object.assign(document.createElement('p'), { className: 'form-msg ok' }));
+        m.hidden = false; m.className = 'form-msg ok'; m.textContent = 'Locale ' + aperto + ' liberato: sul sito ora risulta “Prossimamente”.';
+      });
+      return;
+    }
+    azzera = true;
+    ['nome', 'apertura', 'email_operatore', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'].forEach(function (k) { fl[k].value = ''; });
+    fl.stato.value = 'nuova_apertura'; mostraCampi(); fl.querySelector('[data-cambio]').hidden = true;
+    root.querySelector('[data-ed-titolo]').textContent = 'Nuova insegna · locale ' + aperto; root.querySelector('[data-ed-vedi]').hidden = true;
+    msg(fl, 'Compila i dati della nuova insegna e salva: finché non salvi, il sito non cambia.', true); fl.nome.focus();
+  });
   fl.stato.addEventListener('change', mostraCampi);
   root.querySelector('[data-schede]').addEventListener('click', function (e) {
     var b = e.target.closest('[data-apri]'); if (!b) return;
@@ -84,17 +111,19 @@
     ['nome', 'categoria', 'apertura', 'email_operatore', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'].forEach(function (k) { if (u[k] !== undefined && u[k] !== null) fl[k].value = u[k]; });
     if (!u.categoria) fl.categoria.value = CATS[0] ? CATS[0].id : '';
     if (u.stato === 'libero') fl.stato.value = 'nuova_apertura';
+    daLibero = u.stato === 'libero'; azzera = false; fl.querySelector('[data-cambio]').hidden = daLibero; fl.querySelector('[data-conferma]').hidden = true;
     root.querySelector('[data-ed-titolo]').textContent = u.stato === 'libero' ? 'Nuovo ingresso · locale ' + u.locale : (u.nome + ' · locale ' + u.locale);
     root.querySelector('[data-ed-sotto]').textContent = (u.piano === 'P' ? 'Primo piano' : 'Piano terra') + (u.stato === 'libero' ? ' · oggi il locale è libero: compila i dati del nuovo negozio.' : '');
     var v = root.querySelector('[data-ed-vedi]'); v.hidden = u.stato === 'libero'; v.href = '../negozi/' + (u.slug ? u.slug + '/' : 'scheda/?locale=' + u.locale);
     mostraCampi(); elenco.hidden = true; fl.hidden = false; fl.scrollIntoView({ block: 'start' });
   });
   root.querySelector('[data-torna]').addEventListener('click', function () { fl.hidden = true; elenco.hidden = false; disegnaSchede(); });
-  function datiForm() { var o = {}; ['stato', 'nome', 'categoria', 'apertura', 'email_operatore', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'].forEach(function (k) { o[k] = fl[k].value.trim(); }); return o; }
+  function datiForm() { var o = { azzera: azzera, da_libero: daLibero }; ['stato', 'nome', 'categoria', 'apertura', 'email_operatore', 'telefono', 'whatsapp', 'email', 'sito', 'instagram', 'orari', 'descrizione'].forEach(function (k) { o[k] = fl[k].value.trim(); }); return o; }
   function salvaLocale() {
     var o = datiForm();
     return call({ azione: 'salva_locale', locale: aperto, dati: o }).then(function (r) {
-      if (r.ok && window.LF) { var u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; window.LF = window.LF; u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; if (u) { if (o.stato === 'libero') { u.stato = 'libero'; u.nome = ''; } else { Object.keys(o).forEach(function (k) { u[k] = o[k]; }); } } }
+      if (r.ok && window.LF) { var u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; window.LF = window.LF; u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; if (u) { Object.keys(o).forEach(function (k) { if (k !== 'azzera' && k !== 'da_libero') u[k] = o[k]; }); if (o.azzera || o.da_libero) { u.slug = ''; u.logo = null; } } }
+      if (r.ok) { azzera = false; daLibero = false; }
       if (r.ok) call({ azione: 'stato' }).then(function (x) { if (x.ok) { accessi = x.accessi || []; disegnaAccessi(); } });
       return r;
     });
@@ -102,8 +131,8 @@
   fl.addEventListener('submit', function (e) {
     e.preventDefault();
     salvaLocale().then(function (r) {
-      msg(fl, r.ok ? (fl.stato.value === 'libero' ? 'Locale liberato: sul sito ora risulta “Prossimamente”.' : 'Scheda salvata: mappa, elenco e pagina del negozio sono aggiornati.') : r.errore, r.ok);
-      if (r.ok) { root.querySelector('[data-ed-vedi]').hidden = fl.stato.value === 'libero'; root.querySelector('[data-ed-titolo]').textContent = (fl.stato.value === 'libero' ? 'Locale ' : fl.nome.value + ' · locale ') + aperto; }
+      msg(fl, r.ok ? 'Scheda salvata: mappa, elenco e pagina del negozio sono aggiornati.' : r.errore, r.ok);
+      if (r.ok) { var v = root.querySelector('[data-ed-vedi]'), u = window.LF.locali.filter(function (x) { return x.locale === aperto; })[0]; v.hidden = false; v.href = '../negozi/' + (u && u.slug ? u.slug + '/' : 'scheda/?locale=' + aperto); root.querySelector('[data-ed-titolo]').textContent = fl.nome.value + ' · locale ' + aperto; fl.querySelector('[data-cambio]').hidden = false; }
     });
   });
   var bz = root.querySelector('[data-bozza]');

@@ -465,7 +465,7 @@ def admin():
     <button class="linklike" type="button" data-torna>← Tutti i locali</button>
     <h2 data-ed-titolo>Locale</h2>
     <p class="muted" data-ed-sotto></p>
-    <label>Stato<select name="stato"><option value="aperto">Aperto</option><option value="nuova_apertura">Nuova apertura (in arrivo)</option><option value="libero">Libero – prossimamente</option></select></label>
+    <label>Stato<select name="stato"><option value="aperto">Aperto</option><option value="nuova_apertura">Nuova apertura (in arrivo)</option></select></label>
     <div data-se-occupato>
      <label>Nome dell’insegna<input name="nome" required></label>
      <label>Settore<select name="categoria" data-categorie></select></label>
@@ -481,6 +481,12 @@ def admin():
      <label>Instagram<input name="instagram" placeholder="https://www.instagram.com/…"></label>
      <label>Orari<input name="orari" placeholder="Tutti i giorni 9:00–20:30"></label>
      <label>Descrizione<textarea name="descrizione" rows="5"></textarea></label>
+    </div>
+    <div class="cambio" data-cambio>
+     <b>Cambio di gestione</b>
+     <p class="muted small">Le modifiche qui sopra sono correzioni: logo, foto e pagina restano. Se nel locale entra un’altra attività, usa questi tasti: il locale torna a zero.</p>
+     <div class="row-btn"><button class="btn" type="button" data-chiedi="nuova">Nuova insegna</button><button class="btn" type="button" data-chiedi="libera">Libera il locale</button></div>
+     <div class="conferma" data-conferma hidden><p data-conferma-testo></p><div class="row-btn"><button class="btn btn-accent" type="button" data-conferma-si>Conferma</button><button class="btn" type="button" data-conferma-no>Annulla</button></div></div>
     </div>
     <div class="row-btn">
      <button class="btn btn-dark" type="submit">Salva la scheda</button>

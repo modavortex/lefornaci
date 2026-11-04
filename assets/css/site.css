@@ -330,3 +330,7 @@ body.has-sticky{padding-bottom:84px}
 .bozza-tag{justify-self:start;background:#FFF6E5;color:#6B4A12;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700}
 .bozza-head{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:14px}.bozza-head dt{color:var(--muted)}.bozza-head dd{margin:0;font-weight:600;word-break:break-word}
 .bozza-testo{white-space:pre-wrap;font:14px/1.55 inherit;font-family:inherit;background:#F6F4F1;border-radius:12px;padding:14px;margin:0}
+
+.cambio{border-top:1px solid var(--line-2);padding-top:14px;display:grid;gap:8px}
+.conferma{background:#FBE4DB;color:#6E2A18;border-radius:12px;padding:12px 14px;display:grid;gap:10px}.conferma p{margin:0;line-height:1.5}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent)}
