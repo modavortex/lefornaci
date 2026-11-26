@@ -252,34 +252,38 @@
   });
 
 
-  // Cassa Fornaci Club (admin e negozi)
-  root.querySelectorAll('[data-cassa]').forEach(function (box) {
-    var tipo = 'punti', f = box.querySelector('[data-cassa-form]'), out = box.querySelector('[data-cassa-esito]');
-    var testi = { punti: 'Accredita i punti', gift: 'Scala dalla gift card', premio: 'Conferma il premio' };
-    box.querySelectorAll('[data-cassa-tipo]').forEach(function (b) { b.addEventListener('click', function () {
-      tipo = b.getAttribute('data-cassa-tipo'); out.hidden = true;
-      box.querySelectorAll('[data-cassa-tipo]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      f.querySelectorAll('[data-c]').forEach(function (l) { l.hidden = l.getAttribute('data-c').split(' ').indexOf(tipo) < 0; });
-      f.querySelector('[data-cassa-ok]').textContent = testi[tipo];
-    }); });
-    f.addEventListener('submit', function (e) {
-      e.preventDefault(); if (!window.FC) return;
-      var neg = (root.querySelector('[data-vista="negozio"]:not([hidden]) [data-mio-nome]') || {}).textContent || 'Direzione';
-      var imp = parseFloat(String(f.importo.value).replace(',', '.')), r;
-      if (tipo === 'punti') r = FC.accredita(f.tessera.value, imp, neg);
-      if (tipo === 'gift') r = FC.usaGift(f.gift.value, imp, neg);
-      if (tipo === 'premio') r = FC.usaPremio(f.premio.value);
-      out.hidden = false; out.className = 'cassa-esito ' + (r.ok ? 'ok' : 'err');
-      out.textContent = !r.ok ? r.errore : tipo === 'punti' ? '+' + r.punti + ' punti a ' + r.nome + '. Ora ha ' + r.totale + ' punti.' : tipo === 'gift' ? 'Fatto. Saldo residuo della gift card: ' + FC.euro(r.saldo) + '.' : 'Premio “' + r.titolo + '” convalidato.';
-      if (r.ok) { f.reset(); kpi(); }
-    });
-  });
-  function kpi() {
-    var k = root.querySelector('[data-club-kpi]'); if (!k || !window.FC) return;
-    var d = FC.dati(), g = d.gift || [], ven = g.reduce(function (t, x) { return t + x.importo; }, 0), res = g.reduce(function (t, x) { return t + x.saldo; }, 0);
-    k.innerHTML = [['Soci (demo)', d.socio ? 1 : 0], ['Punti in circolo', d.punti || 0], ['Gift card vendute', g.length], ['Incasso gift card', FC.euro(ven)], ['Saldo ancora da spendere', FC.euro(res)]]
+  // Fornaci Club e gift card (direzione / Info Point)
+  function clubAdmin() {
+    if (!window.FC || !root.querySelector('[data-adm-scontrini]')) return;
+    var d = FC.dati(), sc = d.scontrini || [], g = d.gift || [];
+    var attesa = sc.filter(function (x) { return x.stato === 'in_verifica'; });
+    var tab = root.querySelector('[data-tab="cassa"]'); if (tab) tab.textContent = 'Club e gift card' + (attesa.length ? ' (' + attesa.length + ')' : '');
+    root.querySelector('[data-club-kpi]').innerHTML = [['Soci (demo)', d.socio ? 1 : 0], ['Scontrini da verificare', attesa.length], ['Punti in circolo', d.punti || 0], ['Gift card ordinate', g.length], ['Incasso gift card', FC.euro(g.reduce(function (t, x) { return t + x.importo + (x.costo || 0); }, 0))]]
       .map(function (x) { return '<div><small>' + x[0] + '</small><b>' + x[1] + '</b></div>'; }).join('');
+    root.querySelector('[data-adm-scontrini]').innerHTML = sc.length ? sc.map(function (x) {
+      return '<div class="adm-sc' + (x.stato !== 'in_verifica' ? ' fatto' : '') + '"><button type="button" class="adm-foto" data-zoom aria-label="Ingrandisci lo scontrino"><img src="' + x.foto + '" alt=""></button><span><b>' + esc(x.negozio) + ' · ' + FC.euro(x.importo) + '</b><small class="muted">Scontrino del ' + esc(new Date(x.data + 'T12:00:00').toLocaleDateString('it-IT')) + (x.numero ? ' · n. ' + esc(x.numero) : '') + ' · ' + esc((d.socio || {}).nome || '') + ' · caricato il ' + esc(x.caricato) + '</small>' +
+        (x.stato === 'in_verifica' ? '<span class="row-btn"><button class="btn btn-primary" type="button" data-sc-ok="' + x.id + '">Approva +' + x.punti + '</button><button class="btn" type="button" data-sc-no="' + x.id + '">Rifiuta</button></span>' : '<span class="pill ' + (x.stato === 'approvato' ? 'pill-ok' : '') + '">' + (x.stato === 'approvato' ? 'Approvato' : 'Rifiutato') + '</span>') + '</span></div>';
+    }).join('') : '<p class="muted">Nessuno scontrino caricato.</p>';
+    root.querySelector('[data-adm-gift]').innerHTML = g.length ? g.map(function (x) {
+      var passi = FC.statiGift[x.consegna] || FC.statiGift.infopoint, prossimo = passi[x.stato + 1];
+      return '<div class="adm-gc"><span><b>' + esc(x.ordine) + ' · ' + FC.euro(x.importo) + '</b><small class="muted">' + esc(x.da) + (x.regalo && x.per ? ' → per ' + esc(x.per) : '') + ' · ' + (x.consegna === 'casa' ? 'spedizione: ' + esc(x.indirizzo) : 'ritiro Info Point') + (x.messaggio ? ' · biglietto: “' + esc(x.messaggio) + '”' : '') + '</small></span>' +
+        '<span class="pill">' + esc(passi[x.stato]) + '</span>' + (prossimo ? '<button class="btn" type="button" data-gc-avanza="' + x.ordine + '">Segna: ' + esc(prossimo.toLowerCase()) + '</button>' : '') + '</div>';
+    }).join('') : '<p class="muted">Nessuna gift card ordinata.</p>';
   }
-  kpi();
+  var paneClub = root.querySelector('[data-pane="cassa"]');
+  if (paneClub) {
+    paneClub.addEventListener('click', function (e) {
+      var t = e.target.closest('button'); if (!t || !window.FC) return;
+      if (t.hasAttribute('data-sc-ok')) { FC.verificaScontrino(t.getAttribute('data-sc-ok'), true); clubAdmin(); }
+      if (t.hasAttribute('data-sc-no')) { FC.verificaScontrino(t.getAttribute('data-sc-no'), false, 'Scontrino non valido o non leggibile'); clubAdmin(); }
+      if (t.hasAttribute('data-gc-avanza')) { FC.avanzaGift(t.getAttribute('data-gc-avanza')); clubAdmin(); }
+      if (t.hasAttribute('data-zoom')) { var ov = document.createElement('div'); ov.className = 'qr-full'; ov.innerHTML = '<div class="qr-box"><img src="' + t.querySelector('img').src + '" alt="Scontrino" style="max-height:70vh;width:auto"><button class="btn btn-dark" type="button">Chiudi</button></div>'; ov.addEventListener('click', function () { ov.remove(); }); document.body.appendChild(ov); }
+    });
+    paneClub.querySelector('[data-premio-form]').addEventListener('submit', function (e) {
+      e.preventDefault(); var r = FC.usaPremio(e.target.premio.value), out = paneClub.querySelector('[data-premio-esito]');
+      out.hidden = false; out.className = 'cassa-esito ' + (r.ok ? 'ok' : 'err'); out.textContent = r.ok ? 'Premio “' + r.titolo + '” consegnato.' : r.errore; if (r.ok) e.target.reset();
+    });
+  }
+  clubAdmin();
   if (token) avvia(); else vista('login');
 })();

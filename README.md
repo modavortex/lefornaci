@@ -47,8 +47,8 @@ Lo strumento è in `/strumenti/traccia/`. Si sceglie un locale, si spostano gli 
 4. L'accesso operatori diventa attivo con la versione su WordPress del centro.
 
 ## Fornaci Club, Gift card e App (versione dimostrativa)
-- **/club/** — tessera fedeltà digitale con QR, punti, premi, portafoglio gift card. Regole e premi in `data/centro.json` → `club`.
-- **/gift-card/** — acquisto gift card (importo, grafica, messaggio), pagamento **simulato**, controllo saldo. Tagli e grafiche in `data/centro.json` → `giftcard`.
-- **Cassa** — nell'area riservata (negozi e direzione): accredita punti da scontrino, scala gift card, convalida premi.
+- **/club/** — tessera fedeltà digitale. I punti si guadagnano **caricando la foto dello scontrino** degli acquisti al centro (ultimi 30 giorni, minimo 5 €, niente doppioni): la direzione lo verifica e accredita 1 punto per euro. I premi si ritirano all'Info Point mostrando il codice. Regole in `data/centro.json` → `club`.
+- **/gift-card/** — la gift card è una **carta prepagata su circuito di pagamento** (come nei principali centri commerciali): si paga al POS dei negozi aderenti, anche in più volte. Online si ordina e si paga (in demo pagamento simulato); si ritira all'Info Point o arriva a casa e si attiva alla consegna. Massimo 250 € per carta. Impostazioni in `data/centro.json` → `giftcard`.
+- **Area riservata → Club e gift card** — verifica scontrini (foto ingrandibile, approva/rifiuta), avanzamento ordini gift card, consegna premi all'Info Point.
 - **App** — il sito si installa sul telefono (manifest + service worker, funziona anche offline). Nessuno store necessario.
-- In demo i dati restano sul telefono di chi prova. Per la versione reale: pagamenti con Stripe/Satispay del centro e archivio soci/gift card nel motore (Foglio Google o database).
+- Per la versione reale servono: un emittente di gift card prepagate per centri commerciali (circuito Mastercard/Visa a rete limitata), il conto di pagamento del centro (Stripe/Satispay) e l'archivio soci/scontrini nel motore.

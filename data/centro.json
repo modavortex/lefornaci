@@ -124,13 +124,13 @@
    {
     "punti": 200,
     "titolo": "Buono da 5 €",
-    "testo": "Spendibile in tutti i negozi aderenti",
+    "testo": "Caricato su una gift card, ritiro all’Info Point",
     "valore": 5
    },
    {
     "punti": 400,
     "titolo": "Buono da 12 €",
-    "testo": "Spendibile in tutti i negozi aderenti",
+    "testo": "Caricato su una gift card, ritiro all’Info Point",
     "valore": 12
    },
    {
@@ -142,16 +142,21 @@
    {
     "punti": 800,
     "titolo": "Buono da 30 €",
-    "testo": "Spendibile in tutti i negozi aderenti",
+    "testo": "Caricato su una gift card, ritiro all’Info Point",
     "valore": 30
    }
   ],
   "vantaggi": [
-   "1 punto per ogni euro speso nei negozi aderenti",
+   "Carica lo scontrino dei tuoi acquisti al centro: 1 punto per ogni euro",
    "50 punti di benvenuto all'iscrizione",
    "100 punti il giorno del tuo compleanno",
-   "Offerte riservate ai soci dai negozi del centro"
-  ]
+   "Premi da ritirare all'Info Point"
+  ],
+  "scontrino": {
+   "giorni": 30,
+   "min_importo": 5,
+   "verifica": "entro 24 ore"
+  }
  },
  "giftcard": {
   "tagli": [
@@ -161,7 +166,7 @@
    150
   ],
   "min": 10,
-  "max": 500,
+  "max": 250,
   "validita_mesi": 12,
   "design": [
    {
@@ -191,6 +196,20 @@
     "sfondo": "linear-gradient(135deg,#F3E3DC 0%,#FFFFFF 100%)",
     "testo": "#17140F",
     "accento": "#B4472B"
+   }
+  ],
+  "consegna": [
+   {
+    "id": "infopoint",
+    "nome": "Ritiro all’Info Point",
+    "costo": 0,
+    "testo": "Pronta in 24 ore, si attiva quando la ritiri"
+   },
+   {
+    "id": "casa",
+    "nome": "Spedizione a casa",
+    "costo": 4.9,
+    "testo": "Raccomandata in 3–5 giorni lavorativi, si attiva con un SMS"
    }
   ]
  }

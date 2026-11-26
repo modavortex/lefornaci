@@ -64,6 +64,7 @@ I = {
  'cal': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
  'card': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg>',
  'gift': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3.5 8 4.5 9 8 12 8zM12 8s1.5-4.5 4-3.5S15 8 12 8z"/></svg>',
+ 'cam': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
  'phone': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>',
  'menu': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
 }
@@ -240,16 +241,16 @@ def home():
   <div class="perks">
    <a class="perk perk-club" href="club/">
     <div class="perk-card" aria-hidden="true"><span class="t-brand">LE FORNACI<small>Fornaci Club</small></span><span class="perk-pt"><b>%(benv)d</b>punti di benvenuto</span></div>
-    <div><h3>Fornaci Club</h3><p class="muted">La tessera fedeltà digitale: 1 punto per ogni euro speso nei negozi aderenti, premi e buoni da spendere al centro.</p><span class="btn btn-dark">Iscriviti gratis</span></div>
+    <div><h3>Fornaci Club</h3><p class="muted">La tessera fedeltà digitale: fotografa gli scontrini dei tuoi acquisti al centro, 1 punto ogni euro, premi da ritirare all’Info Point.</p><span class="btn btn-dark">Iscriviti gratis</span></div>
    </a>
    <a class="perk perk-gift" href="gift-card/">
-    <div class="perk-card gift" aria-hidden="true"><span class="t-brand">LE FORNACI<small>Gift card</small></span><span class="perk-pt"><b>da 10 €</b>a 500 €</span></div>
-    <div><h3>Gift card</h3><p class="muted">Il regalo che va sempre bene: si compra online in un minuto e si spende in tutti i negozi del centro.</p><span class="btn btn-dark">Regala una gift card</span></div>
+    <div class="perk-card gift" aria-hidden="true"><span class="t-brand">LE FORNACI<small>Gift card</small></span><span class="perk-pt"><b>da 10 €</b>a 250 €</span></div>
+    <div><h3>Gift card</h3><p class="muted">La carta prepagata da regalare: si ordina online e si paga al POS di tutti i negozi aderenti, anche in più volte.</p><span class="btn btn-dark">Regala una gift card</span></div>
    </a>
   </div>
   <div class="app-banner" data-app-banner>
    <img src="assets/img/app/icon-192.png" alt="" width="56" height="56">
-   <div><b>Scarica l’app Le Fornaci</b><span class="muted">Tessera, punti e gift card sempre in tasca. Gratis, senza passare dagli store.</span></div>
+   <div><b>Scarica l’app Le Fornaci</b><span class="muted">Tessera, scontrini e punti sempre in tasca. Gratis, senza passare dagli store.</span></div>
    <button class="btn btn-primary" type="button" data-installa>Installa</button>
   </div>
  </section>
@@ -458,10 +459,14 @@ def club():
    <div>
     <p class="eyebrow">Tessera fedeltà digitale · gratis</p>
     <h1>%(nome)s</h1>
-    <p class="lead">Fai acquisti nei negozi del centro, accumula punti e trasformali in buoni da spendere alle Fornaci. La tessera vive nel tuo telefono: niente plastica, niente app da scaricare dagli store.</p>
+    <p class="lead">Fai acquisti nei negozi del centro, fotografa lo scontrino e accumula punti da trasformare in premi. La tessera vive nel tuo telefono: niente plastica, niente app da scaricare dagli store.</p>
     <ul class="vantaggi">%(vant)s</ul>
    </div>
    <div class="tessera demo-tessera" aria-hidden="true"><div class="t-top"><span class="t-brand">LE FORNACI<small>%(nome)s</small></span><span class="t-punti"><b>%(benv)d</b>punti</span></div><div class="t-chip"></div><div class="t-bottom"><span><small>Socio</small><b>Il tuo nome</b><span class="t-num">LF •••• •••• ••••</span></span></div></div>
+  </section>
+  <section class="section">
+   <h2 class="h-sm">Come funziona</h2>
+   <ol class="steps"><li><b>Fai acquisti</b><span>In qualsiasi negozio aderente del centro.</span></li><li><b>Fotografa lo scontrino</b><span>Dall’app, entro %(gg)d giorni. Lo verifichiamo %(verif)s.</span></li><li><b>Ritira i premi</b><span>1 punto ogni euro. Con i punti scegli il premio e lo ritiri all’Info Point.</span></li></ol>
   </section>
   <section class="section two-col">
    <form class="card form" novalidate>
@@ -488,21 +493,38 @@ def club():
   <div class="club-grid">
    <div>
     <div data-tessera></div>
-    <p class="muted center small">Tocca il QR e mostralo alla cassa per accumulare punti.</p>
     <div class="card prog" data-progresso></div>
+    <button class="btn btn-primary btn-lg btn-scontrino" type="button" data-apri-scontrino>%(cam)sCarica uno scontrino</button>
+    <p class="muted center small">Per ritirare un premio mostra la tessera all’Info Point.</p>
    </div>
    <div>
     <section><h2 class="h-sm">Premi</h2><div class="premi" data-premi></div></section>
     <section class="section-sm" data-miei-premi hidden><h2 class="h-sm">I miei premi</h2><div data-lista></div></section>
    </div>
   </div>
+  <section class="section"><div class="section-head"><h2 class="h-sm">I miei scontrini</h2><button class="linklike" type="button" data-apri-scontrino>+ Carica</button></div><ul class="scontrini card" data-scontrini></ul></section>
   <section class="section" id="portafoglio"><div class="section-head"><h2 class="h-sm">Le mie gift card</h2><a href="../gift-card/">Compra</a></div><div class="wallet" data-wallet></div></section>
   <section class="section"><h2 class="h-sm">Movimenti</h2><ul class="movimenti card" data-movimenti></ul></section>
   <p class="center small" style="margin-top:28px"><button class="linklike" type="button" data-esci-club>Cancella la tessera da questo telefono</button></p>
+  <div class="sheet-bg" data-sheet-scontrino hidden>
+   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sc-t">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="row" style="justify-content:space-between;align-items:center"><h2 id="sc-t" class="h-sm" style="margin:0">Carica lo scontrino</h2><button class="linklike" type="button" data-chiudi>Annulla</button></div>
+    <form class="form" style="padding:0" novalidate>
+     <label class="foto-sc"><input type="file" name="foto" accept="image/*" capture="environment"><span class="foto-prev" data-anteprima-sc></span><span class="btn">%(cam)sScatta o scegli la foto</span></label>
+     <label>Negozio<select name="negozio" required></select></label>
+     <div class="two"><label>Importo totale (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label><label>Data<input name="data" type="date"></label></div>
+     <label>Numero scontrino <small class="muted">(facoltativo)</small><input name="numero" inputmode="numeric" autocomplete="off"></label>
+     <button class="btn btn-primary btn-lg" type="submit">Invia per la verifica</button>
+     <p class="form-msg" role="status" hidden></p>
+     <p class="small muted">Valgono gli scontrini dei negozi aderenti degli ultimi %(gg)d giorni, importo minimo %(min)s. Ogni scontrino si carica una volta sola.</p>
+    </form>
+   </div>
+  </div>
   <div class="conferma center" data-conferma-esci hidden><p>La tessera e i punti di questa demo verranno cancellati.</p><div class="row-btn" style="justify-content:center"><button class="btn btn-accent" type="button" data-esci-si>Cancella</button></div></div>
  </div>
-</div>''' % dict(nome=e(K['nome']), vant=vant, benv=K['benvenuto'], comp=K['compleanno'], premi=premi, phone=I['phone'])
-    write('club/index.html', page('../', 'Fornaci Club – tessera fedeltà digitale | Le Fornaci Beinasco', 'Fornaci Club: la tessera fedeltà digitale del centro commerciale Le Fornaci. Punti, premi e buoni da spendere nei negozi del centro.', body, 'club', '', QR_JS + '<script src="../assets/js/club-page.js" defer></script>', canonical='club/'))
+</div>''' % dict(nome=e(K['nome']), vant=vant, benv=K['benvenuto'], comp=K['compleanno'], premi=premi, phone=I['phone'], cam=I['cam'], gg=K['scontrino']['giorni'], verif=e(K['scontrino']['verifica']), min=('%d €' % K['scontrino']['min_importo']))
+    write('club/index.html', page('../', 'Fornaci Club – tessera fedeltà digitale | Le Fornaci Beinasco', 'Fornaci Club: la tessera fedeltà digitale del centro commerciale Le Fornaci. Punti, premi e buoni da spendere nei negozi del centro.', body, 'club', '', '<script src="../assets/js/dati.js" defer></script>' + QR_JS + '<script src="../assets/js/club-page.js" defer></script>', canonical='club/'))
 
 # ---------- GIFT CARD ----------
 def giftcard():
@@ -510,12 +532,12 @@ def giftcard():
     body = '''
 <div class="wrap gift" data-gift>
  <section class="gift-head" data-scelta>
-  <p class="eyebrow">Spendibile in tutti i negozi aderenti</p>
+  <p class="eyebrow">Carta prepagata · negozi aderenti</p>
   <h1>Gift card Le Fornaci</h1>
-  <p class="lead">Scegli l’importo e la grafica, aggiungi un messaggio e regalala subito: arriva via email o su WhatsApp e si spende in più volte.</p>
+  <p class="lead">La carta regalo del centro: si paga direttamente al POS dei negozi aderenti, come una normale carta, anche in più volte. Ordinala online e ritirala all’Info Point o ricevila a casa.</p>
  </section>
  <div class="gift-grid">
-  <div class="gift-preview"><div data-anteprima></div><ul class="gift-facts"><li>Valida %(mesi)d mesi</li><li>Si usa in più volte</li><li>Saldo sempre visibile</li></ul></div>
+  <div class="gift-preview"><div data-anteprima></div><ul class="gift-facts"><li>Si paga al POS</li><li>Si usa in più volte</li><li>Valida %(mesi)d mesi</li><li>Da %(min)d a %(max)d €</li></ul></div>
   <form class="card form" data-gift-form novalidate>
    <fieldset><legend>1 · Importo</legend><div class="chips" data-tagli></div></fieldset>
    <fieldset><legend>2 · Grafica</legend><div class="swatches" data-design></div></fieldset>
@@ -525,8 +547,12 @@ def giftcard():
      <div class="two"><label>Nome di chi la riceve<input name="per" autocomplete="off" maxlength="40"></label><label>Email di chi la riceve <small class="muted">(facoltativa)</small><input name="email" type="email" autocomplete="off"></label></div>
      <label>Messaggio<textarea name="messaggio" rows="2" maxlength="140" placeholder="Buon compleanno! Scegli tu il regalo che preferisci."></textarea></label>
     </div>
-    <label>Il tuo nome<input name="da" autocomplete="given-name" maxlength="40"></label>
+    <label>Il tuo nome e cognome<input name="da" autocomplete="name" maxlength="60"></label>
    </fieldset>
+   <fieldset><legend>4 · Consegna</legend><div class="opts" data-consegne></div>
+    <label data-indirizzo hidden>Indirizzo di spedizione<textarea name="indirizzo" rows="2" autocomplete="street-address" placeholder="Via, numero civico, CAP, città"></textarea></label>
+   </fieldset>
+   <div class="righe" data-righe></div>
    <div class="gift-tot"><span>Totale</span><b data-totale></b></div>
    <p class="small" data-punti-info></p>
    <button class="btn btn-primary btn-lg" type="submit">Vai al pagamento</button>
@@ -535,16 +561,17 @@ def giftcard():
   </form>
  </div>
  <section class="gift-done" data-fatto hidden>
-  <p class="eyebrow" style="color:var(--ok)">Pagamento completato</p>
-  <h1>La tua gift card è pronta!</h1>
+  <p class="eyebrow" style="color:var(--ok)" data-ordine>Ordine confermato</p>
+  <h1>Grazie! La tua gift card è ordinata</h1>
   <div class="gift-done-card" data-carta></div>
+  <ol class="track" data-track></ol>
   <p class="lead" data-fatto-testo></p>
-  <div class="row-btn"><a class="btn btn-primary" data-wa target="_blank" rel="noopener">Inviala su WhatsApp</a><button class="btn" type="button" data-copia>Copia il codice</button><a class="btn" href="../club/#portafoglio">Apri il portafoglio</a><button class="btn" type="button" data-un-altra>Comprane un’altra</button></div>
+  <div class="row-btn"><a class="btn btn-primary" href="../club/#portafoglio">Segui l’ordine</a><button class="btn" type="button" data-un-altra>Comprane un’altra</button></div>
  </section>
  <section class="section two-col">
   <div class="card pad">
    <h2 class="h-sm">Controlla il saldo</h2>
-   <form class="form" data-saldo-form novalidate style="padding:0"><label>Codice della gift card<input name="codice" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label><button class="btn btn-dark" type="submit">Controlla</button><p class="form-msg" role="status" hidden></p></form>
+   <form class="form" data-saldo-form novalidate style="padding:0"><label>Numero d’ordine o ultime 4 cifre della carta<input name="codice" placeholder="GC123456 oppure 4821" autocapitalize="characters"></label><button class="btn btn-dark" type="submit">Controlla</button><p class="form-msg" role="status" hidden></p></form>
   </div>
   <div class="card pad" id="aziende">
    <h2 class="h-sm">Per aziende e welfare</h2>
@@ -555,9 +582,10 @@ def giftcard():
  <section class="section">
   <h2 class="h-sm">Domande frequenti</h2>
   <div class="faq">
-   <details><summary>Dove posso usarla?</summary><p>In tutti i negozi aderenti della galleria Le Fornaci. Alla cassa basta mostrare il codice QR dal telefono.</p></details>
-   <details><summary>Posso usarla in più volte?</summary><p>Sì: l’importo speso viene scalato e il saldo resta disponibile fino alla scadenza.</p></details>
-   <details><summary>Quanto dura?</summary><p>%(mesi)d mesi dalla data di acquisto.</p></details>
+   <details><summary>Come si usa?</summary><p>È una carta prepagata su circuito di pagamento: alla cassa dei negozi aderenti si paga al POS come con una normale carta. Funziona solo nei negozi del centro.</p></details>
+   <details><summary>Posso usarla in più volte?</summary><p>Sì: ogni pagamento scala l’importo e il saldo resta disponibile fino alla scadenza.</p></details>
+   <details><summary>Come la ricevo?</summary><p>Ritiro gratuito all’Info Point del centro (pronta in 24 ore, si attiva al ritiro con un documento) oppure spedizione a casa con raccomandata.</p></details>
+   <details><summary>Quanto dura?</summary><p>%(mesi)d mesi dall’attivazione. L’importo massimo è %(max)d € per carta.</p></details>
    <details><summary>Guadagno punti Fornaci Club?</summary><p>Sì, 1 punto per ogni euro, se sei iscritto al Club.</p></details>
   </div>
  </section>
@@ -569,10 +597,10 @@ def giftcard():
    <div class="riepilogo" data-riepilogo></div>
    <div class="metodi"><button type="button" data-metodo="carta" aria-pressed="true">Carta</button><button type="button" data-metodo="wallet" aria-pressed="false">Apple Pay / Google Pay</button><button type="button" data-metodo="paypal" aria-pressed="false">PayPal</button><button type="button" data-metodo="satispay" aria-pressed="false">Satispay</button></div>
    <button class="btn btn-primary btn-lg" type="button" data-paga>Paga</button>
-   <p class="small muted center">Nella versione reale il pagamento avviene sulla pagina sicura del circuito scelto.</p>
+   <p class="small muted center">Nella versione reale il pagamento avviene sulla pagina sicura del circuito scelto e la carta viene emessa dal fornitore del centro.</p>
   </div>
  </div>
-</div>''' % dict(mesi=G['validita_mesi'], mail=e(C['email']))
+</div>''' % dict(mesi=G['validita_mesi'], mail=e(C['email']), min=G['min'], max=G['max'])
     write('gift-card/index.html', page('../', 'Gift card – Le Fornaci Beinasco', 'Compra online la gift card del centro commerciale Le Fornaci: da 10 a 500 euro, spendibile in tutti i negozi aderenti, anche in più volte.', body, 'gift', '', QR_JS + '<script src="../assets/js/gift.js" defer></script>', canonical='gift-card/'))
 
 # ---------- APP (PWA) ----------
@@ -634,7 +662,7 @@ def admin():
   <div class="note" data-cambiare hidden>Stai usando la password iniziale: cambiala ora dalla scheda <b>Sicurezza</b>.</div>
   <div class="tabs" role="tablist">
    <button role="tab" data-tab="schede" aria-selected="true">Schede locali</button>
-   <button role="tab" data-tab="cassa" aria-selected="false">Club e cassa</button>
+   <button role="tab" data-tab="cassa" aria-selected="false">Club e gift card</button>
    <button role="tab" data-tab="vetrina" aria-selected="false">Vetrina</button>
    <button role="tab" data-tab="richieste" aria-selected="false">Richieste</button>
    <button role="tab" data-tab="negozi" aria-selected="false">Accessi negozi</button>
@@ -695,20 +723,16 @@ def admin():
   </div>
   <div data-pane="cassa" class="card pane" hidden>
    <h2>Fornaci Club e gift card</h2>
-   <p class="muted">Riepilogo e cassa. I negozi hanno la stessa cassa nella loro area.</p>
    <div class="kpi" data-club-kpi></div>
-   <div class="cassa" data-cassa>
-     <div class="seg seg-3"><button type="button" data-cassa-tipo="punti" aria-pressed="true">Punti</button><button type="button" data-cassa-tipo="gift" aria-pressed="false">Gift card</button><button type="button" data-cassa-tipo="premio" aria-pressed="false">Premio</button></div>
-     <form class="form" style="padding:0" data-cassa-form novalidate>
-      <label data-c="punti">Numero tessera<input name="tessera" inputmode="numeric" placeholder="LF 1234 5678 9012"></label>
-      <label data-c="gift" hidden>Codice gift card<input name="gift" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label>
-      <label data-c="premio" hidden>Codice premio<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label>
-      <label data-c="punti gift">Importo dello scontrino (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
-      <button class="btn btn-dark" type="submit" data-cassa-ok>Accredita i punti</button>
-     </form>
-     <div class="cassa-esito" data-cassa-esito hidden></div>
-     <p class="demo-hint">Demo: funziona con la tessera e le gift card create su questo stesso telefono.</p>
-    </div>
+   <h3>Scontrini da verificare</h3>
+   <p class="muted small">Controlla foto, negozio, data e importo. Approvando, i punti arrivano subito al cliente.</p>
+   <div data-adm-scontrini></div>
+   <h3>Gift card ordinate</h3>
+   <p class="muted small">Prepara la carta dal fornitore, poi segna i passaggi: pronta al ritiro (o spedita) e attivata alla consegna.</p>
+   <div data-adm-gift></div>
+   <h3>Info Point: consegna un premio</h3>
+   <form class="form" style="padding:0" data-premio-form novalidate><label>Codice premio del cliente<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label><button class="btn btn-dark" type="submit">Conferma la consegna</button><div class="cassa-esito" data-premio-esito hidden></div></form>
+   <p class="demo-hint">Demo: vedi scontrini e ordini fatti su questo stesso telefono.</p>
   </div>
   <div data-pane="vetrina" class="card pane" hidden>
    <h2>Negozi in evidenza in home</h2>
@@ -750,20 +774,6 @@ def admin():
  <section data-vista="negozio" hidden>
   <div class="admin-top"><div><p class="eyebrow" style="color:var(--accent)" data-mio-locale></p><h1 data-mio-nome>La tua scheda</h1></div><button class="btn" type="button" data-esci>Esci</button></div>
   <div class="note" data-cambiare-n hidden>Stai usando il codice ricevuto dalla direzione: scegli una password tua qui sotto, in “Sicurezza”.</div>
-  <details class="card cassa-box" open><summary><b>Cassa Fornaci Club</b><span class="muted small">Punti, gift card e premi dei clienti</span></summary>
-   <div class="cassa" data-cassa>
-     <div class="seg seg-3"><button type="button" data-cassa-tipo="punti" aria-pressed="true">Punti</button><button type="button" data-cassa-tipo="gift" aria-pressed="false">Gift card</button><button type="button" data-cassa-tipo="premio" aria-pressed="false">Premio</button></div>
-     <form class="form" style="padding:0" data-cassa-form novalidate>
-      <label data-c="punti">Numero tessera<input name="tessera" inputmode="numeric" placeholder="LF 1234 5678 9012"></label>
-      <label data-c="gift" hidden>Codice gift card<input name="gift" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label>
-      <label data-c="premio" hidden>Codice premio<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label>
-      <label data-c="punti gift">Importo dello scontrino (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
-      <button class="btn btn-dark" type="submit" data-cassa-ok>Accredita i punti</button>
-     </form>
-     <div class="cassa-esito" data-cassa-esito hidden></div>
-     <p class="demo-hint">Demo: funziona con la tessera e le gift card create su questo stesso telefono.</p>
-    </div>
-  </details>
   <form class="card form" data-form="scheda">
    <label class="consenso" style="font-size:15px!important;color:var(--ink)"><input type="checkbox" name="pausa"> <span><b>Metti in pausa le modifiche</b>: finché è attivo, sul sito resta la versione precedente. Toglilo quando hai finito.</span></label>
    <div class="two"><label>Telefono<input name="telefono" type="tel"></label><label>WhatsApp<input name="whatsapp" type="tel"></label></div>

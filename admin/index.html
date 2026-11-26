@@ -63,7 +63,7 @@
   <div class="note" data-cambiare hidden>Stai usando la password iniziale: cambiala ora dalla scheda <b>Sicurezza</b>.</div>
   <div class="tabs" role="tablist">
    <button role="tab" data-tab="schede" aria-selected="true">Schede locali</button>
-   <button role="tab" data-tab="cassa" aria-selected="false">Club e cassa</button>
+   <button role="tab" data-tab="cassa" aria-selected="false">Club e gift card</button>
    <button role="tab" data-tab="vetrina" aria-selected="false">Vetrina</button>
    <button role="tab" data-tab="richieste" aria-selected="false">Richieste</button>
    <button role="tab" data-tab="negozi" aria-selected="false">Accessi negozi</button>
@@ -124,20 +124,16 @@
   </div>
   <div data-pane="cassa" class="card pane" hidden>
    <h2>Fornaci Club e gift card</h2>
-   <p class="muted">Riepilogo e cassa. I negozi hanno la stessa cassa nella loro area.</p>
    <div class="kpi" data-club-kpi></div>
-   <div class="cassa" data-cassa>
-     <div class="seg seg-3"><button type="button" data-cassa-tipo="punti" aria-pressed="true">Punti</button><button type="button" data-cassa-tipo="gift" aria-pressed="false">Gift card</button><button type="button" data-cassa-tipo="premio" aria-pressed="false">Premio</button></div>
-     <form class="form" style="padding:0" data-cassa-form novalidate>
-      <label data-c="punti">Numero tessera<input name="tessera" inputmode="numeric" placeholder="LF 1234 5678 9012"></label>
-      <label data-c="gift" hidden>Codice gift card<input name="gift" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label>
-      <label data-c="premio" hidden>Codice premio<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label>
-      <label data-c="punti gift">Importo dello scontrino (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
-      <button class="btn btn-dark" type="submit" data-cassa-ok>Accredita i punti</button>
-     </form>
-     <div class="cassa-esito" data-cassa-esito hidden></div>
-     <p class="demo-hint">Demo: funziona con la tessera e le gift card create su questo stesso telefono.</p>
-    </div>
+   <h3>Scontrini da verificare</h3>
+   <p class="muted small">Controlla foto, negozio, data e importo. Approvando, i punti arrivano subito al cliente.</p>
+   <div data-adm-scontrini></div>
+   <h3>Gift card ordinate</h3>
+   <p class="muted small">Prepara la carta dal fornitore, poi segna i passaggi: pronta al ritiro (o spedita) e attivata alla consegna.</p>
+   <div data-adm-gift></div>
+   <h3>Info Point: consegna un premio</h3>
+   <form class="form" style="padding:0" data-premio-form novalidate><label>Codice premio del cliente<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label><button class="btn btn-dark" type="submit">Conferma la consegna</button><div class="cassa-esito" data-premio-esito hidden></div></form>
+   <p class="demo-hint">Demo: vedi scontrini e ordini fatti su questo stesso telefono.</p>
   </div>
   <div data-pane="vetrina" class="card pane" hidden>
    <h2>Negozi in evidenza in home</h2>
@@ -179,20 +175,6 @@
  <section data-vista="negozio" hidden>
   <div class="admin-top"><div><p class="eyebrow" style="color:var(--accent)" data-mio-locale></p><h1 data-mio-nome>La tua scheda</h1></div><button class="btn" type="button" data-esci>Esci</button></div>
   <div class="note" data-cambiare-n hidden>Stai usando il codice ricevuto dalla direzione: scegli una password tua qui sotto, in “Sicurezza”.</div>
-  <details class="card cassa-box" open><summary><b>Cassa Fornaci Club</b><span class="muted small">Punti, gift card e premi dei clienti</span></summary>
-   <div class="cassa" data-cassa>
-     <div class="seg seg-3"><button type="button" data-cassa-tipo="punti" aria-pressed="true">Punti</button><button type="button" data-cassa-tipo="gift" aria-pressed="false">Gift card</button><button type="button" data-cassa-tipo="premio" aria-pressed="false">Premio</button></div>
-     <form class="form" style="padding:0" data-cassa-form novalidate>
-      <label data-c="punti">Numero tessera<input name="tessera" inputmode="numeric" placeholder="LF 1234 5678 9012"></label>
-      <label data-c="gift" hidden>Codice gift card<input name="gift" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label>
-      <label data-c="premio" hidden>Codice premio<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label>
-      <label data-c="punti gift">Importo dello scontrino (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
-      <button class="btn btn-dark" type="submit" data-cassa-ok>Accredita i punti</button>
-     </form>
-     <div class="cassa-esito" data-cassa-esito hidden></div>
-     <p class="demo-hint">Demo: funziona con la tessera e le gift card create su questo stesso telefono.</p>
-    </div>
-  </details>
   <form class="card form" data-form="scheda">
    <label class="consenso" style="font-size:15px!important;color:var(--ink)"><input type="checkbox" name="pausa"> <span><b>Metti in pausa le modifiche</b>: finché è attivo, sul sito resta la versione precedente. Toglilo quando hai finito.</span></label>
    <div class="two"><label>Telefono<input name="telefono" type="tel"></label><label>WhatsApp<input name="whatsapp" type="tel"></label></div>
@@ -237,7 +219,7 @@
  </div></div>
 </footer>
 <nav class="tabbar" aria-label="Navigazione rapida"><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Home</a><a href="../negozi/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Negozi</a><a href="../club/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg>Club</a><a href="../gift-card/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3.5 8 4.5 9 8 12 8zM12 8s1.5-4.5 4-3.5S15 8 12 8z"/></svg>Gift card</a><a href="../eventi/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Eventi</a></nav>
-<script>window.LF_MOTORE="";window.LF_CONF={"club": {"nome": "Fornaci Club", "benvenuto": 50, "compleanno": 100, "euro_per_punto": 1, "premi": [{"punti": 200, "titolo": "Buono da 5 €", "testo": "Spendibile in tutti i negozi aderenti", "valore": 5}, {"punti": 400, "titolo": "Buono da 12 €", "testo": "Spendibile in tutti i negozi aderenti", "valore": 12}, {"punti": 600, "titolo": "2 ingressi al cinema", "testo": "The Space Cinema, dal lunedì al giovedì", "valore": 0}, {"punti": 800, "titolo": "Buono da 30 €", "testo": "Spendibile in tutti i negozi aderenti", "valore": 30}], "vantaggi": ["1 punto per ogni euro speso nei negozi aderenti", "50 punti di benvenuto all'iscrizione", "100 punti il giorno del tuo compleanno", "Offerte riservate ai soci dai negozi del centro"]}, "giftcard": {"tagli": [25, 50, 100, 150], "min": 10, "max": 500, "validita_mesi": 12, "design": [{"id": "classica", "nome": "Classica", "sfondo": "linear-gradient(135deg,#1E1A16 0%,#3A322A 100%)", "testo": "#FFFFFF", "accento": "#E9967F"}, {"id": "terracotta", "nome": "Terracotta", "sfondo": "linear-gradient(135deg,#B4472B 0%,#E07A55 100%)", "testo": "#FFFFFF", "accento": "#FFE3D6"}, {"id": "natale", "nome": "Natale", "sfondo": "linear-gradient(135deg,#1F4A35 0%,#2F6B4C 60%,#C8A050 140%)", "testo": "#FFFFFF", "accento": "#F2D58A"}, {"id": "festa", "nome": "Auguri", "sfondo": "linear-gradient(135deg,#F3E3DC 0%,#FFFFFF 100%)", "testo": "#17140F", "accento": "#B4472B"}]}};</script>
+<script>window.LF_MOTORE="";window.LF_CONF={"club": {"nome": "Fornaci Club", "benvenuto": 50, "compleanno": 100, "euro_per_punto": 1, "premi": [{"punti": 200, "titolo": "Buono da 5 €", "testo": "Caricato su una gift card, ritiro all’Info Point", "valore": 5}, {"punti": 400, "titolo": "Buono da 12 €", "testo": "Caricato su una gift card, ritiro all’Info Point", "valore": 12}, {"punti": 600, "titolo": "2 ingressi al cinema", "testo": "The Space Cinema, dal lunedì al giovedì", "valore": 0}, {"punti": 800, "titolo": "Buono da 30 €", "testo": "Caricato su una gift card, ritiro all’Info Point", "valore": 30}], "vantaggi": ["Carica lo scontrino dei tuoi acquisti al centro: 1 punto per ogni euro", "50 punti di benvenuto all'iscrizione", "100 punti il giorno del tuo compleanno", "Premi da ritirare all'Info Point"], "scontrino": {"giorni": 30, "min_importo": 5, "verifica": "entro 24 ore"}}, "giftcard": {"tagli": [25, 50, 100, 150], "min": 10, "max": 250, "validita_mesi": 12, "design": [{"id": "classica", "nome": "Classica", "sfondo": "linear-gradient(135deg,#1E1A16 0%,#3A322A 100%)", "testo": "#FFFFFF", "accento": "#E9967F"}, {"id": "terracotta", "nome": "Terracotta", "sfondo": "linear-gradient(135deg,#B4472B 0%,#E07A55 100%)", "testo": "#FFFFFF", "accento": "#FFE3D6"}, {"id": "natale", "nome": "Natale", "sfondo": "linear-gradient(135deg,#1F4A35 0%,#2F6B4C 60%,#C8A050 140%)", "testo": "#FFFFFF", "accento": "#F2D58A"}, {"id": "festa", "nome": "Auguri", "sfondo": "linear-gradient(135deg,#F3E3DC 0%,#FFFFFF 100%)", "testo": "#17140F", "accento": "#B4472B"}], "consegna": [{"id": "infopoint", "nome": "Ritiro all’Info Point", "costo": 0, "testo": "Pronta in 24 ore, si attiva quando la ritiri"}, {"id": "casa", "nome": "Spedizione a casa", "costo": 4.9, "testo": "Raccomandata in 3–5 giorni lavorativi, si attiva con un SMS"}]}};</script>
 <script src="../assets/js/pwa.js" defer></script>
 <script src="../assets/js/demo.js" defer></script>
 <script src="../assets/js/site.js" defer></script>
