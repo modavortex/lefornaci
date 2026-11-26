@@ -251,5 +251,35 @@
     });
   });
 
+
+  // Cassa Fornaci Club (admin e negozi)
+  root.querySelectorAll('[data-cassa]').forEach(function (box) {
+    var tipo = 'punti', f = box.querySelector('[data-cassa-form]'), out = box.querySelector('[data-cassa-esito]');
+    var testi = { punti: 'Accredita i punti', gift: 'Scala dalla gift card', premio: 'Conferma il premio' };
+    box.querySelectorAll('[data-cassa-tipo]').forEach(function (b) { b.addEventListener('click', function () {
+      tipo = b.getAttribute('data-cassa-tipo'); out.hidden = true;
+      box.querySelectorAll('[data-cassa-tipo]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      f.querySelectorAll('[data-c]').forEach(function (l) { l.hidden = l.getAttribute('data-c').split(' ').indexOf(tipo) < 0; });
+      f.querySelector('[data-cassa-ok]').textContent = testi[tipo];
+    }); });
+    f.addEventListener('submit', function (e) {
+      e.preventDefault(); if (!window.FC) return;
+      var neg = (root.querySelector('[data-vista="negozio"]:not([hidden]) [data-mio-nome]') || {}).textContent || 'Direzione';
+      var imp = parseFloat(String(f.importo.value).replace(',', '.')), r;
+      if (tipo === 'punti') r = FC.accredita(f.tessera.value, imp, neg);
+      if (tipo === 'gift') r = FC.usaGift(f.gift.value, imp, neg);
+      if (tipo === 'premio') r = FC.usaPremio(f.premio.value);
+      out.hidden = false; out.className = 'cassa-esito ' + (r.ok ? 'ok' : 'err');
+      out.textContent = !r.ok ? r.errore : tipo === 'punti' ? '+' + r.punti + ' punti a ' + r.nome + '. Ora ha ' + r.totale + ' punti.' : tipo === 'gift' ? 'Fatto. Saldo residuo della gift card: ' + FC.euro(r.saldo) + '.' : 'Premio “' + r.titolo + '” convalidato.';
+      if (r.ok) { f.reset(); kpi(); }
+    });
+  });
+  function kpi() {
+    var k = root.querySelector('[data-club-kpi]'); if (!k || !window.FC) return;
+    var d = FC.dati(), g = d.gift || [], ven = g.reduce(function (t, x) { return t + x.importo; }, 0), res = g.reduce(function (t, x) { return t + x.saldo; }, 0);
+    k.innerHTML = [['Soci (demo)', d.socio ? 1 : 0], ['Punti in circolo', d.punti || 0], ['Gift card vendute', g.length], ['Incasso gift card', FC.euro(ven)], ['Saldo ancora da spendere', FC.euro(res)]]
+      .map(function (x) { return '<div><small>' + x[0] + '</small><b>' + x[1] + '</b></div>'; }).join('');
+  }
+  kpi();
   if (token) avvia(); else vista('login');
 })();

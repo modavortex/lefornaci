@@ -45,3 +45,10 @@ Lo strumento è in `/strumenti/traccia/`. Si sceglie un locale, si spostano gli 
 2. Impostare i reindirizzamenti 301 elencati in `docs/REINDIRIZZAMENTI.md`, per non perdere le visite che oggi arrivano da Google.
 3. Collegare il modulo "Apri un negozio" e la newsletter alla casella della direzione.
 4. L'accesso operatori diventa attivo con la versione su WordPress del centro.
+
+## Fornaci Club, Gift card e App (versione dimostrativa)
+- **/club/** — tessera fedeltà digitale con QR, punti, premi, portafoglio gift card. Regole e premi in `data/centro.json` → `club`.
+- **/gift-card/** — acquisto gift card (importo, grafica, messaggio), pagamento **simulato**, controllo saldo. Tagli e grafiche in `data/centro.json` → `giftcard`.
+- **Cassa** — nell'area riservata (negozi e direzione): accredita punti da scontrino, scala gift card, convalida premi.
+- **App** — il sito si installa sul telefono (manifest + service worker, funziona anche offline). Nessuno store necessario.
+- In demo i dati restano sul telefono di chi prova. Per la versione reale: pagamenti con Stripe/Satispay del centro e archivio soci/gift card nel motore (Foglio Google o database).

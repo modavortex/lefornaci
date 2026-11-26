@@ -114,5 +114,84 @@
    "testo": "Una postazione in galleria, senza negozio, per esporre e vendere i tuoi prodotti in occasioni ed eventi.",
    "dettaglio": "Date o occasione"
   }
+ },
+ "club": {
+  "nome": "Fornaci Club",
+  "benvenuto": 50,
+  "compleanno": 100,
+  "euro_per_punto": 1,
+  "premi": [
+   {
+    "punti": 200,
+    "titolo": "Buono da 5 €",
+    "testo": "Spendibile in tutti i negozi aderenti",
+    "valore": 5
+   },
+   {
+    "punti": 400,
+    "titolo": "Buono da 12 €",
+    "testo": "Spendibile in tutti i negozi aderenti",
+    "valore": 12
+   },
+   {
+    "punti": 600,
+    "titolo": "2 ingressi al cinema",
+    "testo": "The Space Cinema, dal lunedì al giovedì",
+    "valore": 0
+   },
+   {
+    "punti": 800,
+    "titolo": "Buono da 30 €",
+    "testo": "Spendibile in tutti i negozi aderenti",
+    "valore": 30
+   }
+  ],
+  "vantaggi": [
+   "1 punto per ogni euro speso nei negozi aderenti",
+   "50 punti di benvenuto all'iscrizione",
+   "100 punti il giorno del tuo compleanno",
+   "Offerte riservate ai soci dai negozi del centro"
+  ]
+ },
+ "giftcard": {
+  "tagli": [
+   25,
+   50,
+   100,
+   150
+  ],
+  "min": 10,
+  "max": 500,
+  "validita_mesi": 12,
+  "design": [
+   {
+    "id": "classica",
+    "nome": "Classica",
+    "sfondo": "linear-gradient(135deg,#1E1A16 0%,#3A322A 100%)",
+    "testo": "#FFFFFF",
+    "accento": "#E9967F"
+   },
+   {
+    "id": "terracotta",
+    "nome": "Terracotta",
+    "sfondo": "linear-gradient(135deg,#B4472B 0%,#E07A55 100%)",
+    "testo": "#FFFFFF",
+    "accento": "#FFE3D6"
+   },
+   {
+    "id": "natale",
+    "nome": "Natale",
+    "sfondo": "linear-gradient(135deg,#1F4A35 0%,#2F6B4C 60%,#C8A050 140%)",
+    "testo": "#FFFFFF",
+    "accento": "#F2D58A"
+   },
+   {
+    "id": "festa",
+    "nome": "Auguri",
+    "sfondo": "linear-gradient(135deg,#F3E3DC 0%,#FFFFFF 100%)",
+    "testo": "#17140F",
+    "accento": "#B4472B"
+   }
+  ]
  }
 }

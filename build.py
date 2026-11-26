@@ -62,6 +62,9 @@ I = {
  'home': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
  'map': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>',
  'cal': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ 'card': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg>',
+ 'gift': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8S10.5 3.5 8 4.5 9 8 12 8zM12 8s1.5-4.5 4-3.5S15 8 12 8z"/></svg>',
+ 'phone': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>',
  'menu': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
 }
 
@@ -75,9 +78,9 @@ def logo_or_mono(s, cls=''):
     return '<span class="monogram %s %s" aria-hidden="true">%s</span>' % (cls, 'dark' if s['locale'] == '40' else '', e(mono))
 
 def page(rel, title, desc, body, current='', extra_head='', scripts='', body_class='has-tabbar', canonical=''):
-    nav = [('', 'Home', 'home'), ('negozi/', 'Negozi e mappa', 'negozi'), ('eventi/', 'Eventi', 'eventi'), ('apri-il-tuo-spazio/', 'Apri il tuo spazio', 'apri')]
+    nav = [('', 'Home', 'home'), ('negozi/', 'Negozi e mappa', 'negozi'), ('eventi/', 'Eventi', 'eventi'), ('club/', 'Fornaci Club', 'club'), ('gift-card/', 'Gift card', 'gift'), ('apri-il-tuo-spazio/', 'Apri il tuo spazio', 'apri')]
     navhtml = ''.join('<a href="%s%s"%s>%s</a>' % (rel, u, ' aria-current="page"' if k == current else '', t) for u, t, k in nav)
-    tabs = [('', 'Home', 'home', I['home']), ('negozi/', 'Negozi', 'negozi', I['map']), ('eventi/', 'Eventi', 'eventi', I['cal']), ('#arrivare', 'Arrivare', 'arrivare', I['pin'])]
+    tabs = [('', 'Home', 'home', I['home']), ('negozi/', 'Negozi', 'negozi', I['map']), ('club/', 'Club', 'club', I['card']), ('gift-card/', 'Gift card', 'gift', I['gift']), ('eventi/', 'Eventi', 'eventi', I['cal'])]
     tabhtml = ''.join('<a href="%s%s"%s>%s%s</a>' % ('' if u.startswith('#') else rel, u if not u.startswith('#') else (rel + u if current != 'home' else u), ' aria-current="page"' if k == current else '', ic, t) for u, t, k, ic in tabs)
     robots = '<meta name="robots" content="noindex">' if ANTEPRIMA else '<meta name="robots" content="index,follow">'
     canon = '<link rel="canonical" href="%s/%s">' % (SITO, canonical) if canonical is not None else ''
@@ -94,6 +97,12 @@ def page(rel, title, desc, body, current='', extra_head='', scripts='', body_cla
 <meta property="og:description" content="%(desc)s">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" href="%(rel)sassets/img/logo-lefornaci.png">
+<link rel="manifest" href="%(rel)smanifest.webmanifest">
+<link rel="apple-touch-icon" href="%(rel)sassets/img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Le Fornaci">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Instrument+Sans:wght@400..700&display=swap">
 <link rel="stylesheet" href="%(rel)sassets/css/site.css">
@@ -108,20 +117,21 @@ def page(rel, title, desc, body, current='', extra_head='', scripts='', body_cla
   <span class="open-now" data-open-now>Galleria 9:00–20:30</span>
   <button class="menu-btn" type="button" data-menu aria-expanded="false" aria-label="Menu">%(menu)s</button>
  </div>
- <nav class="drawer" aria-label="Menu">%(nav)s<a href="%(rel)saccesso-operatori/">Accesso operatori</a></nav>
+ <nav class="drawer" aria-label="Menu">%(nav)s<a href="%(rel)saccesso-operatori/">Accesso operatori</a><a href="#" data-installa class="drawer-app">Scarica l’app Le Fornaci</a></nav>
 </header>
 <main>
 %(body)s
 </main>
 %(foot)s
 <nav class="tabbar" aria-label="Navigazione rapida">%(tabs)s</nav>
-<script>window.LF_MOTORE=%(motore)s;</script>
+<script>window.LF_MOTORE=%(motore)s;window.LF_CONF=%(conf)s;</script>
+<script src="%(rel)sassets/js/pwa.js" defer></script>
 <script src="%(rel)sassets/js/demo.js" defer></script>
 <script src="%(rel)sassets/js/site.js" defer></script>
 %(scripts)s
 </body>
 </html>
-''' % dict(title=e(title), desc=e(desc), robots=robots, canon=canon, rel=rel, extra=extra_head, bc=body_class, nav=navhtml, menu=I['menu'], body=body, foot=footer(rel), tabs=tabhtml, scripts=scripts, motore=json.dumps(C.get('motore', '')))
+''' % dict(title=e(title), desc=e(desc), robots=robots, canon=canon, rel=rel, extra=extra_head, bc=body_class, nav=navhtml, menu=I['menu'], body=body, foot=footer(rel), tabs=tabhtml, scripts=scripts, motore=json.dumps(C.get('motore', '')), conf=json.dumps({'club': C['club'], 'giftcard': C['giftcard']}, ensure_ascii=False))
 
 def footer(rel):
     orari = ''.join('<li>%s: %s</li>' % (e(o['cosa']), e(o['quando'])) for o in C['orari'])
@@ -138,8 +148,8 @@ def footer(rel):
    <p class="muted" style="color:#BDB5AA;font-size:13px;margin-top:6px">Newsletter: -10%% sul primo acquisto.</p>
   </div>
   <div><h3>Orari</h3><ul>%(orari)s</ul></div>
-  <div><h3>Visita</h3><ul><li><a href="%(rel)snegozi/">Negozi e mappa</a></li><li><a href="%(rel)seventi/">Eventi</a></li><li><a href="%(ig)s">Instagram</a></li><li><a href="%(fb)s">Facebook</a></li></ul></div>
-  <div><h3>Business</h3><ul><li><a href="%(rel)sapri-il-tuo-spazio/">Apri il tuo spazio</a></li><li><a href="%(rel)sapri-il-tuo-spazio/?tipo=temporary">Temporary</a></li><li><a href="%(rel)sapri-il-tuo-spazio/?tipo=banchetto">Banchetti in galleria</a></li><li><a href="%(rel)saccesso-operatori/">Accesso operatori</a></li><li><a href="%(rel)sadmin/">Amministrazione</a></li></ul></div>
+  <div><h3>Visita</h3><ul><li><a href="%(rel)snegozi/">Negozi e mappa</a></li><li><a href="%(rel)seventi/">Eventi</a></li><li><a href="%(rel)sclub/">Fornaci Club</a></li><li><a href="%(rel)sgift-card/">Gift card</a></li><li><a href="#" data-installa>Scarica l’app</a></li><li><a href="%(ig)s">Instagram</a></li><li><a href="%(fb)s">Facebook</a></li></ul></div>
+  <div><h3>Business</h3><ul><li><a href="%(rel)sapri-il-tuo-spazio/">Apri il tuo spazio</a></li><li><a href="%(rel)sapri-il-tuo-spazio/?tipo=temporary">Temporary</a></li><li><a href="%(rel)sapri-il-tuo-spazio/?tipo=banchetto">Banchetti in galleria</a></li><li><a href="%(rel)sgift-card/#aziende">Gift card per aziende</a></li><li><a href="%(rel)saccesso-operatori/">Accesso operatori</a></li><li><a href="%(rel)sadmin/">Amministrazione</a></li></ul></div>
  </div>
  <div class="bottom"><div class="wrap">
   <span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap">© %(anno)s Le Fornaci Mega Shopping Center · Centro gestito da <span class="chip" style="padding:5px 9px"><img src="%(rel)sassets/img/logo-svicom.png" alt="Svicom Real Estate Managers" width="70" height="22" style="height:22px;width:auto"></span></span>
@@ -225,6 +235,25 @@ def home():
   </a>
  </section>
 
+ <section class="section" aria-labelledby="cl-t">
+  <div class="section-head"><h2 id="cl-t">Vantaggi per te</h2></div>
+  <div class="perks">
+   <a class="perk perk-club" href="club/">
+    <div class="perk-card" aria-hidden="true"><span class="t-brand">LE FORNACI<small>Fornaci Club</small></span><span class="perk-pt"><b>%(benv)d</b>punti di benvenuto</span></div>
+    <div><h3>Fornaci Club</h3><p class="muted">La tessera fedeltà digitale: 1 punto per ogni euro speso nei negozi aderenti, premi e buoni da spendere al centro.</p><span class="btn btn-dark">Iscriviti gratis</span></div>
+   </a>
+   <a class="perk perk-gift" href="gift-card/">
+    <div class="perk-card gift" aria-hidden="true"><span class="t-brand">LE FORNACI<small>Gift card</small></span><span class="perk-pt"><b>da 10 €</b>a 500 €</span></div>
+    <div><h3>Gift card</h3><p class="muted">Il regalo che va sempre bene: si compra online in un minuto e si spende in tutti i negozi del centro.</p><span class="btn btn-dark">Regala una gift card</span></div>
+   </a>
+  </div>
+  <div class="app-banner" data-app-banner>
+   <img src="assets/img/app/icon-192.png" alt="" width="56" height="56">
+   <div><b>Scarica l’app Le Fornaci</b><span class="muted">Tessera, punti e gift card sempre in tasca. Gratis, senza passare dagli store.</span></div>
+   <button class="btn btn-primary" type="button" data-installa>Installa</button>
+  </div>
+ </section>
+
  <section class="section" aria-labelledby="vt-t">
   <div class="section-head"><h2 id="vt-t">In vetrina</h2><span class="muted" style="font-size:13px">Spazi in evidenza</span></div>
   <div class="scroller" data-vetrina>%(vetrina)s</div>
@@ -234,7 +263,7 @@ def home():
   <div class="section-head"><h2 id="ap-t">Prossime aperture</h2></div>
   <div class="grid grid-2">%(aperture)s</div>
  </section>
-</div>''' % dict(hero=hero, minis=minis, ind=e(C['indirizzo']), arrivi=arrivi, orari=orari, gm=C['mappe']['google'], wz=C['mappe']['waze'], n=len(SHOPS), cta=cta_map, vetrina=vetrina, aperture=aperture)
+</div>''' % dict(hero=hero, minis=minis, ind=e(C['indirizzo']), arrivi=arrivi, orari=orari, gm=C['mappe']['google'], wz=C['mappe']['waze'], n=len(SHOPS), cta=cta_map, vetrina=vetrina, aperture=aperture, benv=C['club']['benvenuto'])
     ld = {'@context': 'https://schema.org', '@type': 'ShoppingCenter', 'name': C['nome'], 'url': SITO,
           'telephone': '+39 011 397 1809', 'address': {'@type': 'PostalAddress', 'streetAddress': 'Strada Torino 34/36', 'postalCode': '10092', 'addressLocality': 'Beinasco', 'addressRegion': 'TO', 'addressCountry': 'IT'},
           'openingHours': 'Mo-Su 09:00-20:30'}
@@ -416,6 +445,164 @@ def apri():
     write('apri-il-tuo-spazio/index.html', page('../', 'Apri il tuo spazio – Le Fornaci Beinasco', 'Negozi, temporary e banchetti in galleria al centro commerciale Le Fornaci di Beinasco: ricevi subito gli spazi disponibili.', body, 'apri', '', scripts, canonical='apri-il-tuo-spazio/'))
     write('apri-un-negozio/index.html', '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Apri il tuo spazio</title><meta http-equiv="refresh" content="0; url=../apri-il-tuo-spazio/"><link rel="canonical" href="../apri-il-tuo-spazio/"><a href="../apri-il-tuo-spazio/">Apri il tuo spazio</a>')
 
+# ---------- FORNACI CLUB ----------
+QR_JS = '<script src="../assets/js/vendor/qrcode.js" defer></script><script src="../assets/js/club.js" defer></script>'
+def club():
+    K = C['club']
+    vant = ''.join('<li>%s<span>%s</span></li>' % (I['card'] if i == 0 else I['gift'], e(v)) for i, v in enumerate(K['vantaggi']))
+    premi = ''.join('<div class="premio"><span class="p-pt">%d<small>punti</small></span><span><b>%s</b><small class="muted">%s</small></span></div>' % (p['punti'], e(p['titolo']), e(p['testo'])) for p in K['premi'])
+    body = '''
+<div class="wrap club" data-club>
+ <div data-club-iscriviti>
+  <section class="club-hero">
+   <div>
+    <p class="eyebrow">Tessera fedeltà digitale · gratis</p>
+    <h1>%(nome)s</h1>
+    <p class="lead">Fai acquisti nei negozi del centro, accumula punti e trasformali in buoni da spendere alle Fornaci. La tessera vive nel tuo telefono: niente plastica, niente app da scaricare dagli store.</p>
+    <ul class="vantaggi">%(vant)s</ul>
+   </div>
+   <div class="tessera demo-tessera" aria-hidden="true"><div class="t-top"><span class="t-brand">LE FORNACI<small>%(nome)s</small></span><span class="t-punti"><b>%(benv)d</b>punti</span></div><div class="t-chip"></div><div class="t-bottom"><span><small>Socio</small><b>Il tuo nome</b><span class="t-num">LF •••• •••• ••••</span></span></div></div>
+  </section>
+  <section class="section two-col">
+   <form class="card form" novalidate>
+    <h2 style="font-size:26px">Iscriviti in 30 secondi</h2>
+    <p class="muted">Ricevi subito la tessera e %(benv)d punti di benvenuto.</p>
+    <div class="two"><label>Nome<input name="nome" autocomplete="given-name" required></label><label>Cognome<input name="cognome" autocomplete="family-name"></label></div>
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <div class="two"><label>Telefono<input name="telefono" type="tel" autocomplete="tel"></label><label>Compleanno <small class="muted">(per i %(comp)d punti)</small><input name="nascita" type="date"></label></div>
+    <label class="consenso"><input type="checkbox" name="privacy"> <span>Accetto il regolamento del Fornaci Club e l’informativa privacy.</span></label>
+    <label class="consenso"><input type="checkbox" name="marketing"> <span>Voglio ricevere offerte ed eventi del centro (facoltativo).</span></label>
+    <button class="btn btn-primary" type="submit">Crea la mia tessera</button>
+    <p class="form-msg" role="status" hidden></p>
+    <p class="demo-hint">Versione dimostrativa: la tessera resta solo su questo telefono.</p>
+   </form>
+   <div>
+    <h2 style="font-size:26px;margin-bottom:12px">I premi</h2>
+    <div class="premi">%(premi)s</div>
+   </div>
+  </section>
+ </div>
+ <div data-club-socio hidden>
+  <div class="club-top"><h1 data-ciao>Ciao!</h1><button class="btn" type="button" data-installa>%(phone)sInstalla l’app</button></div>
+  <p class="form-msg ok" data-flash hidden></p>
+  <div class="club-grid">
+   <div>
+    <div data-tessera></div>
+    <p class="muted center small">Tocca il QR e mostralo alla cassa per accumulare punti.</p>
+    <div class="card prog" data-progresso></div>
+   </div>
+   <div>
+    <section><h2 class="h-sm">Premi</h2><div class="premi" data-premi></div></section>
+    <section class="section-sm" data-miei-premi hidden><h2 class="h-sm">I miei premi</h2><div data-lista></div></section>
+   </div>
+  </div>
+  <section class="section" id="portafoglio"><div class="section-head"><h2 class="h-sm">Le mie gift card</h2><a href="../gift-card/">Compra</a></div><div class="wallet" data-wallet></div></section>
+  <section class="section"><h2 class="h-sm">Movimenti</h2><ul class="movimenti card" data-movimenti></ul></section>
+  <p class="center small" style="margin-top:28px"><button class="linklike" type="button" data-esci-club>Cancella la tessera da questo telefono</button></p>
+  <div class="conferma center" data-conferma-esci hidden><p>La tessera e i punti di questa demo verranno cancellati.</p><div class="row-btn" style="justify-content:center"><button class="btn btn-accent" type="button" data-esci-si>Cancella</button></div></div>
+ </div>
+</div>''' % dict(nome=e(K['nome']), vant=vant, benv=K['benvenuto'], comp=K['compleanno'], premi=premi, phone=I['phone'])
+    write('club/index.html', page('../', 'Fornaci Club – tessera fedeltà digitale | Le Fornaci Beinasco', 'Fornaci Club: la tessera fedeltà digitale del centro commerciale Le Fornaci. Punti, premi e buoni da spendere nei negozi del centro.', body, 'club', '', QR_JS + '<script src="../assets/js/club-page.js" defer></script>', canonical='club/'))
+
+# ---------- GIFT CARD ----------
+def giftcard():
+    G = C['giftcard']
+    body = '''
+<div class="wrap gift" data-gift>
+ <section class="gift-head" data-scelta>
+  <p class="eyebrow">Spendibile in tutti i negozi aderenti</p>
+  <h1>Gift card Le Fornaci</h1>
+  <p class="lead">Scegli l’importo e la grafica, aggiungi un messaggio e regalala subito: arriva via email o su WhatsApp e si spende in più volte.</p>
+ </section>
+ <div class="gift-grid">
+  <div class="gift-preview"><div data-anteprima></div><ul class="gift-facts"><li>Valida %(mesi)d mesi</li><li>Si usa in più volte</li><li>Saldo sempre visibile</li></ul></div>
+  <form class="card form" data-gift-form novalidate>
+   <fieldset><legend>1 · Importo</legend><div class="chips" data-tagli></div></fieldset>
+   <fieldset><legend>2 · Grafica</legend><div class="swatches" data-design></div></fieldset>
+   <fieldset><legend>3 · Per chi è?</legend>
+    <div class="seg"><button type="button" data-per-chi="regalo">È un regalo</button><button type="button" data-per-chi="me">È per me</button></div>
+    <div data-campi-regalo>
+     <div class="two"><label>Nome di chi la riceve<input name="per" autocomplete="off" maxlength="40"></label><label>Email di chi la riceve <small class="muted">(facoltativa)</small><input name="email" type="email" autocomplete="off"></label></div>
+     <label>Messaggio<textarea name="messaggio" rows="2" maxlength="140" placeholder="Buon compleanno! Scegli tu il regalo che preferisci."></textarea></label>
+    </div>
+    <label>Il tuo nome<input name="da" autocomplete="given-name" maxlength="40"></label>
+   </fieldset>
+   <div class="gift-tot"><span>Totale</span><b data-totale></b></div>
+   <p class="small" data-punti-info></p>
+   <button class="btn btn-primary btn-lg" type="submit">Vai al pagamento</button>
+   <p class="form-msg" role="status" hidden></p>
+   <p class="demo-hint">Versione dimostrativa: il pagamento è simulato, nessun addebito.</p>
+  </form>
+ </div>
+ <section class="gift-done" data-fatto hidden>
+  <p class="eyebrow" style="color:var(--ok)">Pagamento completato</p>
+  <h1>La tua gift card è pronta!</h1>
+  <div class="gift-done-card" data-carta></div>
+  <p class="lead" data-fatto-testo></p>
+  <div class="row-btn"><a class="btn btn-primary" data-wa target="_blank" rel="noopener">Inviala su WhatsApp</a><button class="btn" type="button" data-copia>Copia il codice</button><a class="btn" href="../club/#portafoglio">Apri il portafoglio</a><button class="btn" type="button" data-un-altra>Comprane un’altra</button></div>
+ </section>
+ <section class="section two-col">
+  <div class="card pad">
+   <h2 class="h-sm">Controlla il saldo</h2>
+   <form class="form" data-saldo-form novalidate style="padding:0"><label>Codice della gift card<input name="codice" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label><button class="btn btn-dark" type="submit">Controlla</button><p class="form-msg" role="status" hidden></p></form>
+  </div>
+  <div class="card pad" id="aziende">
+   <h2 class="h-sm">Per aziende e welfare</h2>
+   <p class="muted">Gift card come buoni spesa per i dipendenti, premi e regali ai clienti. Importi e grafiche personalizzati, fattura all’azienda.</p>
+   <a class="btn" href="mailto:%(mail)s?subject=Gift%%20card%%20per%%20aziende">Richiedi un preventivo</a>
+  </div>
+ </section>
+ <section class="section">
+  <h2 class="h-sm">Domande frequenti</h2>
+  <div class="faq">
+   <details><summary>Dove posso usarla?</summary><p>In tutti i negozi aderenti della galleria Le Fornaci. Alla cassa basta mostrare il codice QR dal telefono.</p></details>
+   <details><summary>Posso usarla in più volte?</summary><p>Sì: l’importo speso viene scalato e il saldo resta disponibile fino alla scadenza.</p></details>
+   <details><summary>Quanto dura?</summary><p>%(mesi)d mesi dalla data di acquisto.</p></details>
+   <details><summary>Guadagno punti Fornaci Club?</summary><p>Sì, 1 punto per ogni euro, se sei iscritto al Club.</p></details>
+  </div>
+ </section>
+ <div class="sheet-bg" data-checkout hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pay-t">
+   <div class="sheet-handle" aria-hidden="true"></div>
+   <div class="row" style="justify-content:space-between;align-items:center"><h2 id="pay-t" class="h-sm">Pagamento</h2><button class="linklike" type="button" data-chiudi>Annulla</button></div>
+   <div class="demo-banner">Pagamento simulato per la presentazione: nessun addebito.</div>
+   <div class="riepilogo" data-riepilogo></div>
+   <div class="metodi"><button type="button" data-metodo="carta" aria-pressed="true">Carta</button><button type="button" data-metodo="wallet" aria-pressed="false">Apple Pay / Google Pay</button><button type="button" data-metodo="paypal" aria-pressed="false">PayPal</button><button type="button" data-metodo="satispay" aria-pressed="false">Satispay</button></div>
+   <button class="btn btn-primary btn-lg" type="button" data-paga>Paga</button>
+   <p class="small muted center">Nella versione reale il pagamento avviene sulla pagina sicura del circuito scelto.</p>
+  </div>
+ </div>
+</div>''' % dict(mesi=G['validita_mesi'], mail=e(C['email']))
+    write('gift-card/index.html', page('../', 'Gift card – Le Fornaci Beinasco', 'Compra online la gift card del centro commerciale Le Fornaci: da 10 a 500 euro, spendibile in tutti i negozi aderenti, anche in più volte.', body, 'gift', '', QR_JS + '<script src="../assets/js/gift.js" defer></script>', canonical='gift-card/'))
+
+# ---------- APP (PWA) ----------
+def app():
+    man = {'name': 'Le Fornaci Mega Shopping', 'short_name': 'Le Fornaci', 'description': 'Negozi, mappa, eventi, tessera Fornaci Club e gift card del centro commerciale Le Fornaci.',
+           'start_url': 'club/?app=1', 'scope': './', 'display': 'standalone', 'background_color': '#F6F4F1', 'theme_color': '#FFFFFF', 'lang': 'it', 'orientation': 'portrait',
+           'icons': [{'src': 'assets/img/app/icon-192.png', 'sizes': '192x192', 'type': 'image/png'}, {'src': 'assets/img/app/icon-512.png', 'sizes': '512x512', 'type': 'image/png'},
+                     {'src': 'assets/img/app/maskable-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'maskable'}],
+           'shortcuts': [{'name': 'La mia tessera', 'url': 'club/'}, {'name': 'Mappa dei negozi', 'url': 'negozi/'}, {'name': 'Gift card', 'url': 'gift-card/'}]}
+    write('manifest.webmanifest', json.dumps(man, ensure_ascii=False, indent=1))
+    ver = OGGI.strftime('%Y%m%d') + '-' + str(abs(hash(open(os.path.join(R, 'assets/css/site.css')).read() + open(os.path.join(R, 'assets/js/club.js')).read())) % 100000)
+    core = ['./', 'club/', 'gift-card/', 'negozi/', 'eventi/', 'assets/css/site.css', 'assets/js/site.js', 'assets/js/demo.js', 'assets/js/pwa.js', 'assets/js/club.js', 'assets/js/club-page.js', 'assets/js/gift.js', 'assets/js/vendor/qrcode.js', 'assets/js/dati.js', 'assets/js/mappa.js', 'assets/img/logo-lefornaci.png', 'assets/img/loghi.webp', 'assets/img/app/icon-192.png']
+    write('sw.js', '''/* Service worker Le Fornaci — versione %s. Pagine: prima la rete, poi la copia salvata. File: copia salvata aggiornata in background. */
+var V = 'lf-%s', CORE = %s;
+self.addEventListener('install', function (e) { e.waitUntil(caches.open(V).then(function (c) { return c.addAll(CORE.map(function (u) { return new Request(u, { cache: 'reload' }); })).catch(function () {}); }).then(function () { return self.skipWaiting(); })); });
+self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (k) { return Promise.all(k.filter(function (x) { return x !== V; }).map(function (x) { return caches.delete(x); })); }).then(function () { return self.clients.claim(); })); });
+self.addEventListener('fetch', function (e) {
+  var r = e.request; if (r.method !== 'GET' || new URL(r.url).origin !== location.origin) return;
+  if (r.mode === 'navigate') {
+    e.respondWith(fetch(r).then(function (res) { var cp = res.clone(); caches.open(V).then(function (c) { c.put(r, cp); }); return res; })
+      .catch(function () { return caches.match(r).then(function (m) { return m || caches.match('club/'); }); }));
+    return;
+  }
+  e.respondWith(caches.match(r).then(function (m) {
+    var net = fetch(r).then(function (res) { if (res.ok) { var cp = res.clone(); caches.open(V).then(function (c) { c.put(r, cp); }); } return res; }).catch(function () { return m; });
+    return m || net;
+  }));
+});
+''' % (ver, ver, json.dumps(core)))
+
 # ---------- AMMINISTRAZIONE ----------
 def admin():
     body = '''<div class="wrap admin" data-admin>
@@ -447,6 +634,7 @@ def admin():
   <div class="note" data-cambiare hidden>Stai usando la password iniziale: cambiala ora dalla scheda <b>Sicurezza</b>.</div>
   <div class="tabs" role="tablist">
    <button role="tab" data-tab="schede" aria-selected="true">Schede locali</button>
+   <button role="tab" data-tab="cassa" aria-selected="false">Club e cassa</button>
    <button role="tab" data-tab="vetrina" aria-selected="false">Vetrina</button>
    <button role="tab" data-tab="richieste" aria-selected="false">Richieste</button>
    <button role="tab" data-tab="negozi" aria-selected="false">Accessi negozi</button>
@@ -505,6 +693,23 @@ def admin():
     <div class="row-btn"><button class="btn btn-dark" type="button" data-b-copia>Copia il testo</button><button class="btn" type="button" data-b-chiudi>Chiudi</button></div>
    </div>
   </div>
+  <div data-pane="cassa" class="card pane" hidden>
+   <h2>Fornaci Club e gift card</h2>
+   <p class="muted">Riepilogo e cassa. I negozi hanno la stessa cassa nella loro area.</p>
+   <div class="kpi" data-club-kpi></div>
+   <div class="cassa" data-cassa>
+     <div class="seg seg-3"><button type="button" data-cassa-tipo="punti" aria-pressed="true">Punti</button><button type="button" data-cassa-tipo="gift" aria-pressed="false">Gift card</button><button type="button" data-cassa-tipo="premio" aria-pressed="false">Premio</button></div>
+     <form class="form" style="padding:0" data-cassa-form novalidate>
+      <label data-c="punti">Numero tessera<input name="tessera" inputmode="numeric" placeholder="LF 1234 5678 9012"></label>
+      <label data-c="gift" hidden>Codice gift card<input name="gift" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label>
+      <label data-c="premio" hidden>Codice premio<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label>
+      <label data-c="punti gift">Importo dello scontrino (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+      <button class="btn btn-dark" type="submit" data-cassa-ok>Accredita i punti</button>
+     </form>
+     <div class="cassa-esito" data-cassa-esito hidden></div>
+     <p class="demo-hint">Demo: funziona con la tessera e le gift card create su questo stesso telefono.</p>
+    </div>
+  </div>
   <div data-pane="vetrina" class="card pane" hidden>
    <h2>Negozi in evidenza in home</h2>
    <p class="muted">Fino a 4 negozi, con date di inizio e fine. Se un posto è vuoto, la home lo riempie a rotazione.</p>
@@ -545,6 +750,20 @@ def admin():
  <section data-vista="negozio" hidden>
   <div class="admin-top"><div><p class="eyebrow" style="color:var(--accent)" data-mio-locale></p><h1 data-mio-nome>La tua scheda</h1></div><button class="btn" type="button" data-esci>Esci</button></div>
   <div class="note" data-cambiare-n hidden>Stai usando il codice ricevuto dalla direzione: scegli una password tua qui sotto, in “Sicurezza”.</div>
+  <details class="card cassa-box" open><summary><b>Cassa Fornaci Club</b><span class="muted small">Punti, gift card e premi dei clienti</span></summary>
+   <div class="cassa" data-cassa>
+     <div class="seg seg-3"><button type="button" data-cassa-tipo="punti" aria-pressed="true">Punti</button><button type="button" data-cassa-tipo="gift" aria-pressed="false">Gift card</button><button type="button" data-cassa-tipo="premio" aria-pressed="false">Premio</button></div>
+     <form class="form" style="padding:0" data-cassa-form novalidate>
+      <label data-c="punti">Numero tessera<input name="tessera" inputmode="numeric" placeholder="LF 1234 5678 9012"></label>
+      <label data-c="gift" hidden>Codice gift card<input name="gift" placeholder="GC-AB12-CD34-EF56" autocapitalize="characters"></label>
+      <label data-c="premio" hidden>Codice premio<input name="premio" placeholder="PR-AB12-CD34" autocapitalize="characters"></label>
+      <label data-c="punti gift">Importo dello scontrino (€)<input name="importo" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+      <button class="btn btn-dark" type="submit" data-cassa-ok>Accredita i punti</button>
+     </form>
+     <div class="cassa-esito" data-cassa-esito hidden></div>
+     <p class="demo-hint">Demo: funziona con la tessera e le gift card create su questo stesso telefono.</p>
+    </div>
+  </details>
   <form class="card form" data-form="scheda">
    <label class="consenso" style="font-size:15px!important;color:var(--ink)"><input type="checkbox" name="pausa"> <span><b>Metti in pausa le modifiche</b>: finché è attivo, sul sito resta la versione precedente. Toglilo quando hai finito.</span></label>
    <div class="two"><label>Telefono<input name="telefono" type="tel"></label><label>WhatsApp<input name="whatsapp" type="tel"></label></div>
@@ -566,7 +785,7 @@ def admin():
  </section>
  <div class="note demo-note" data-no-motore hidden><b>Versione dimostrativa.</b> Prova con utente <b>admin</b> e password <b>LeFornaci2026</b>. Per entrare come negozio usa il numero del locale e il codice che trovi in <i>Accessi negozi</i> (es. utente <b>40</b>). Le modifiche restano solo su questo browser.</div>
 </div>'''
-    scripts = '<script src="../assets/js/dati.js" defer></script><script src="../assets/js/admin.js" defer></script>'
+    scripts = '<script src="../assets/js/dati.js" defer></script><script src="../assets/js/vendor/qrcode.js" defer></script><script src="../assets/js/club.js" defer></script><script src="../assets/js/admin.js" defer></script>'
     html_ = page('../', 'Area riservata – Le Fornaci', 'Area riservata alla direzione e ai negozi del centro.', body, '', '', scripts, canonical=None).replace('<meta name="robots" content="index,follow">', '<meta name="robots" content="noindex">')
     write('admin/index.html', html_)
     # scheda generica per i nuovi ingressi (prima della pagina dedicata)
@@ -588,7 +807,7 @@ def operatori():
 
 def extra():
     write('404.html', page('/lefornaci/' if ANTEPRIMA else '/', 'Pagina non trovata – Le Fornaci', 'Pagina non trovata.', '<div class="wrap" style="padding:48px 16px"><h1>Pagina non trovata</h1><p class="muted">Forse il negozio ha cambiato indirizzo.</p><a class="btn btn-primary" href="negozi/">Vai a negozi e mappa</a></div>', canonical=None))
-    urls = [''] + ['negozi/', 'eventi/', 'apri-il-tuo-spazio/'] + ['negozi/%s/' % s['slug'] for s in SHOPS]
+    urls = [''] + ['negozi/', 'eventi/', 'club/', 'gift-card/', 'apri-il-tuo-spazio/'] + ['negozi/%s/' % s['slug'] for s in SHOPS]
     write('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n%s</urlset>\n' % ''.join('<url><loc>%s/%s</loc></url>\n' % (SITO, u) for u in urls))
     write('robots.txt', ('User-agent: *\nDisallow: /\n' if ANTEPRIMA else 'User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n' % SITO))
     write('.nojekyll', '')
@@ -598,5 +817,5 @@ def extra():
 if __name__ == '__main__':
     dati_js(); home(); negozi_index()
     for s in SHOPS: shop_page(s)
-    eventi(); apri(); admin(); operatori(); extra()
+    eventi(); apri(); club(); giftcard(); app(); admin(); operatori(); extra()
     print('Fatto: %d negozi, %d locali liberi.' % (len(SHOPS), len(LIBERI)))

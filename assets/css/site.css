@@ -334,3 +334,158 @@ body.has-sticky{padding-bottom:84px}
 .cambio{border-top:1px solid var(--line-2);padding-top:14px;display:grid;gap:8px}
 .conferma{background:#FBE4DB;color:#6E2A18;border-radius:12px;padding:12px 14px;display:grid;gap:10px}.conferma p{margin:0;line-height:1.5}
 .btn-accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ===== App, Fornaci Club, Gift card ===== */
+.tabbar{grid-template-columns:repeat(5,1fr)}
+.drawer-app{color:var(--accent)!important}
+.center{text-align:center}.small{font-size:13px}.h-sm{font-size:22px;margin-bottom:12px}
+.club .eyebrow,.gift .eyebrow{color:var(--accent);margin-bottom:10px}
+.club .lead,.gift .lead{color:var(--ink-2);font-size:17px}
+.btn-lg{min-height:54px;font-size:16px;width:100%}
+.pad{padding:22px}
+.two-col{display:grid;gap:20px}
+@media (min-width:860px){.two-col{grid-template-columns:1.1fr .9fr;align-items:start}}
+.section-sm{padding-top:24px}
+.demo-hint{margin:0;font-size:12.5px;color:#8A6A2E;background:#FFF6E5;border-radius:10px;padding:8px 12px}
+
+/* tessera */
+.tessera{position:relative;aspect-ratio:1.586;max-width:420px;width:100%;border-radius:22px;padding:20px 22px;color:#fff;overflow:hidden;
+  background:radial-gradient(120% 90% at 100% 0%,#B4472B 0%,rgba(180,71,43,0) 55%),linear-gradient(135deg,#1E1A16 0%,#2E2721 60%,#3A2D24 100%);
+  box-shadow:0 18px 40px -18px rgba(30,26,22,.55),inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:space-between}
+.tessera::after{content:"";position:absolute;inset:-40% -10% auto auto;width:70%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,255,255,.08)}
+.t-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.t-brand{font-family:var(--f-display);font-weight:800;letter-spacing:.06em;font-size:17px;line-height:1.05;display:flex;flex-direction:column}
+.t-brand small{font-family:var(--f-body);font-weight:600;letter-spacing:.04em;font-size:12px;color:#E9967F;margin-top:3px}
+.t-punti{text-align:right;font-size:12px;opacity:.85;display:flex;flex-direction:column;line-height:1.1}
+.t-punti b{font-family:var(--f-display);font-size:30px;opacity:1}
+.t-chip{width:38px;height:28px;border-radius:7px;background:linear-gradient(135deg,#E8C988,#B8924A);opacity:.9;position:relative;z-index:1}
+.t-bottom,.g-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;position:relative;z-index:1}
+.t-bottom small{display:block;font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.1em}
+.t-bottom b{display:block;font-size:17px}
+.t-num{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;letter-spacing:.08em;opacity:.9;margin-top:2px}
+.t-qr{width:74px;height:74px;padding:6px;border:0;border-radius:12px;background:#fff;cursor:pointer;flex:0 0 auto}
+.t-qr svg,.t-qr img{width:100%;height:100%;display:block}
+.demo-tessera{transform:rotate(-4deg);margin:10px auto 0}
+
+/* club */
+.club-hero{display:grid;gap:28px;padding:28px 0 8px;align-items:center}
+@media (min-width:860px){.club-hero{grid-template-columns:1.1fr .9fr;padding-top:48px}}
+.vantaggi{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
+.vantaggi li{display:flex;gap:10px;align-items:center;font-weight:600}
+.vantaggi svg{width:20px;height:20px;color:var(--accent);flex:0 0 auto}
+.premi{display:grid;gap:10px}
+.premio{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.premio small{display:block}
+.premio.ok{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.p-pt{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1;text-align:center;min-width:56px}
+.p-pt small{display:block;font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--muted)}
+.p-manca{font-size:13px;font-weight:700;color:var(--muted)}
+.club-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px 0 16px}
+.club-top .btn svg{width:18px;height:18px}
+.in-app .club-top [data-installa]{display:none}
+.club-grid{display:grid;gap:24px}
+@media (min-width:860px){.club-grid{grid-template-columns:420px 1fr;align-items:start}}
+.club-grid .tessera{margin:0 auto}
+.prog{padding:16px 18px;margin-top:14px}
+.prog-top{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:10px;flex-wrap:wrap}
+.prog-top b{font-size:18px}
+.bar{height:10px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#E07A55,var(--accent))}
+.buono{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1.5px dashed #D9A08E;border-radius:14px;background:#fff;margin-bottom:10px}
+.buono small{display:block}.buono .t-num{color:var(--ink-2)}
+.buono.usato{opacity:.55;border-style:solid;border-color:var(--line)}
+.wallet{display:grid;gap:18px}
+@media (min-width:760px){.wallet{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}}
+.wallet-item{display:grid;gap:8px}
+.vuoto{display:grid;gap:8px;justify-items:start;padding:22px;border:1.5px dashed var(--line);border-radius:18px;background:#fff}
+.movimenti{list-style:none;margin:0;padding:6px 18px}
+.movimenti li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line-2)}
+.movimenti li:last-child{border:0}
+.movimenti small{display:block;font-size:12.5px}
+.movimenti .pos{color:var(--ok)}.movimenti .neg{color:var(--accent)}
+
+/* gift card */
+.giftc{position:relative;aspect-ratio:1.586;max-width:420px;width:100%;border-radius:22px;padding:20px 22px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;box-shadow:0 18px 40px -18px rgba(30,26,22,.5);transition:background .3s}
+.giftc::before{content:"";position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;border:22px solid rgba(255,255,255,.08)}
+.g-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative}
+.g-imp{font-family:var(--f-display);font-size:34px;font-weight:800;line-height:1}
+.g-per{font-weight:700;font-size:15px;position:relative}
+.g-msg{margin:0;font-size:14px;line-height:1.4;opacity:.92;min-height:1.4em;position:relative;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.g-msg small{opacity:.8}
+.gift-head{padding:28px 0 10px}
+@media (min-width:860px){.gift-head{padding-top:48px}}
+.gift-grid{display:grid;gap:22px;margin-top:10px}
+@media (min-width:900px){.gift-grid{grid-template-columns:1fr 1fr;align-items:start}.gift-preview{position:sticky;top:90px}}
+.gift-preview{display:grid;gap:14px;justify-items:center}
+.gift-facts{list-style:none;padding:0;margin:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.gift-facts li{font-size:13px;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+.gift fieldset{border:0;padding:0;margin:0;display:grid;gap:12px}
+.gift legend{font-family:var(--f-display);font-weight:800;font-size:19px;margin-bottom:10px;padding:0}
+.gift .chips{margin:0;padding:0;flex-wrap:wrap;overflow:visible}
+.chip-opt{min-height:48px;padding:0 18px;border-radius:14px;border:1.5px solid #D6CFC5;background:#fff;font-weight:800;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.chip-opt[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.chip-altro input{width:76px;border:0;padding:0!important;font-size:16px!important;background:transparent!important;font-weight:700!important}
+.chip-altro:focus-within{border-color:var(--ink)}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sw{aspect-ratio:1.4;border-radius:14px;border:2px solid transparent;cursor:pointer;display:flex;align-items:flex-end;padding:6px 8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.sw span{font-size:11px;font-weight:700;background:rgba(255,255,255,.9);color:var(--ink);border-radius:6px;padding:2px 6px}
+.sw[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px #fff inset}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line-2);border-radius:14px;padding:4px}
+.seg button{min-height:42px;border:0;border-radius:10px;background:transparent;font-weight:700;cursor:pointer;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.gift-tot{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding-top:14px;font-weight:700}
+.gift-tot b{font-family:var(--f-display);font-size:28px}
+.gift-done{padding:28px 0 0;display:grid;gap:14px;justify-items:start}
+.gift-done-card{width:100%;max-width:420px}
+.faq{display:grid;gap:8px}
+.faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.faq summary{font-weight:700;cursor:pointer}
+.faq p{margin:8px 0 0;color:var(--ink-2)}
+/* checkout simulato */
+.sheet-bg{position:fixed;inset:0;z-index:90;background:rgba(23,20,15,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom));display:grid;gap:14px;animation:su .25s ease-out}
+@media (min-width:760px){.sheet-bg{align-items:center}.sheet{border-radius:24px}}
+@keyframes su{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet-handle{width:42px;height:5px;border-radius:9px;background:var(--line);justify-self:center}
+.demo-banner{background:#FFF6E5;color:#6B4A12;border-radius:12px;padding:10px 12px;font-size:13.5px;font-weight:600}
+.riepilogo{display:grid;gap:6px;font-size:15px}.riepilogo div{display:flex;justify-content:space-between;gap:10px}
+.riepilogo .tot{border-top:1px solid var(--line);padding-top:8px;font-weight:700}.riepilogo .tot b{font-size:20px}
+.metodi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metodi button{min-height:48px;border-radius:12px;border:1.5px solid #D6CFC5;background:#fff;font-weight:700;cursor:pointer;font-size:14px;color:var(--ink)}
+.metodi button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+/* QR a tutto schermo e guida installazione */
+.qr-full{position:fixed;inset:0;z-index:100;background:rgba(23,20,15,.6);display:grid;place-items:center;padding:20px}
+.qr-box{background:#fff;border-radius:24px;padding:26px;display:grid;gap:12px;justify-items:center;text-align:center;width:min(360px,100%)}
+.qr-box svg{width:min(260px,70vw);height:auto}
+.qr-box b{font-family:ui-monospace,Menlo,monospace;font-size:17px;letter-spacing:.06em}
+.qr-box.guida{text-align:left;justify-items:stretch}.qr-box.guida img{justify-self:center;border-radius:16px}.qr-box.guida b{font-family:var(--f-display);font-size:22px;letter-spacing:0;text-align:center}
+.qr-box ol{margin:4px 0;padding-left:20px;display:grid;gap:8px;line-height:1.45}
+/* home: vantaggi + banner app */
+.perks{display:grid;gap:14px}
+@media (min-width:760px){.perks{grid-template-columns:1fr 1fr}}
+.perk{display:grid;grid-template-columns:132px 1fr;gap:18px;align-items:center;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+.perk:hover{color:inherit;border-color:#CFC6BA}
+.perk p{margin:6px 0 12px;font-size:15px}
+.perk-card{aspect-ratio:1.586;border-radius:14px;padding:10px 12px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(120% 90% at 100% 0%,#B4472B 0%,rgba(180,71,43,0) 60%),linear-gradient(135deg,#1E1A16,#3A2D24);transform:rotate(-5deg);box-shadow:0 10px 24px -12px rgba(0,0,0,.5)}
+.perk-card.gift{background:linear-gradient(135deg,#B4472B,#E07A55);transform:rotate(4deg)}
+.perk-card .t-brand{font-size:11px}.perk-card .t-brand small{font-size:9px}
+.perk-card.gift .t-brand small{color:#FFE3D6}
+.perk-pt{font-size:9.5px;line-height:1.15;opacity:.9}.perk-pt b{display:block;font-family:var(--f-display);font-size:20px}
+@media (max-width:420px){.perk{grid-template-columns:96px 1fr;gap:14px;padding:14px}.perk .btn{min-height:42px;padding:10px 14px;font-size:14px}}
+.app-banner{margin-top:14px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--dark);color:#fff;border-radius:var(--r-lg);padding:14px 16px}
+.app-banner img{border-radius:14px}
+.app-banner b{display:block;font-size:16px}.app-banner .muted{color:#BDB5AA;font-size:13.5px;display:block}
+@media (max-width:420px){.app-banner{grid-template-columns:auto 1fr}.app-banner .btn{grid-column:1/-1}}
+/* cassa negozio */
+.cassa{display:grid;gap:14px}
+.cassa-esito{border-radius:14px;padding:14px 16px;font-weight:600}
+.cassa-esito.ok{background:var(--ok-bg);color:var(--ok)}.cassa-esito.err{background:#FBE4DB;color:#8E2A18}
+
+.seg-3{grid-template-columns:repeat(3,1fr)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.kpi div{background:var(--bg);border-radius:14px;padding:12px 14px}.kpi small{display:block;color:var(--muted);font-size:12.5px;font-weight:600}.kpi b{font-family:var(--f-display);font-size:22px}
+.cassa-box{padding:16px 18px;margin-bottom:16px}.cassa-box summary{cursor:pointer;display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.gift fieldset{min-width:0}.gift-grid>*{min-width:0}
+.g-imp{font-size:clamp(24px,8vw,34px)}
+.t-brand{min-width:0}
+.swatches{grid-template-columns:repeat(4,minmax(0,1fr))}.sw{min-width:0;padding:5px}.sw span{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
